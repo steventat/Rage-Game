@@ -38,7 +38,6 @@ public class ProtocolClient extends GameConnectionClient {
 				if(messageTokens[1].compareTo("success") == 0) {
 					System.out.println("Got connection to server\n");
 					game.setIsConnected(true);
-					System.out.println("Sending create messages\n");
 					sendCreateMessage(game.getPlayerPosition());
 				}
 				if(messageTokens[1].compareTo("failure") == 0) { 
@@ -63,7 +62,7 @@ public class ProtocolClient extends GameConnectionClient {
 					System.out.println("error creating ghost avatar");
 				} 
 			}
-			if(messageTokens[0].compareTo("wsds") == 0) { // receive "create"  
+			if(messageTokens[0].compareTo("create") == 0) { // receive "create"  
 				// etc….. 
 			}
 			if(messageTokens[0].compareTo("wsds") == 0) { // receive "want"
@@ -102,6 +101,7 @@ public class ProtocolClient extends GameConnectionClient {
 		try { 	
 			String message = new String("create," + id.toString());
 			message += "," + vector3.x()+"," + vector3.y() + "," + vector3.z();
+			System.out.println("Sending create messages\n");
 			sendPacket(message);
 
 		}

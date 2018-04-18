@@ -33,12 +33,15 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 			// case where server receives a CREATE message
 			// format: create,localid,x,y,z
 			if (msgTokens[0].compareTo("create") == 0) {
+				System.out.println("Obtained create message");
 				UUID clientID = UUID.fromString(msgTokens[1]);
 				String[] pos = {
 				msgTokens[2],
 				msgTokens[3],
 				msgTokens[4]
 				};
+				System.out.println("Sending out create messages to clients");
+				System.out.println("Sending wants details messages to clients");
 				sendCreateMessages(clientID, pos);
 				sendWantsDetailsMessages(clientID);
 			}
