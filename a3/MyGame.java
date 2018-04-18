@@ -303,4 +303,12 @@ class MyGame extends VariableFrameRateGame {
 		}
 		gameObjectsToRemove.clear();
 	}
+	
+	public int getNumGhosts() {
+		if (protClient != null)
+			return protClient.getNumGhosts();
+		else
+			System.out.print("Not connected");
+			return 0;
+	}
 }

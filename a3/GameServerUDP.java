@@ -78,21 +78,26 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 	}
 	public void sendCreateMessages(UUID clientID, String[] position) { // format: create, remoteId, x, y, z
 		try {
-		String message = new String("create," + clientID.toString());
-		message += "," + position[0];
-		message += "," + position[1];
-		message += "," + position[2];
-		forwardPacketToAll(message, clientID);
-	 } catch (IOException e) {
-		e.printStackTrace();
-	 }
+			String message = new String("create," + clientID.toString());
+			message += "," + position[0];
+			message += "," + position[1];
+			message += "," + position[2];
+			forwardPacketToAll(message, clientID);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public void sendDetailsMsg(UUID clientID, UUID remoteId, String[] position) {
 		// etc….. 
 	
 	}
 	public void sendWantsDetailsMessages(UUID clientID) { 
-	// etc….. 
+		try {
+			String message = new String("wsds," + clientID.toString());
+			sendPacket(message, clientID);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
   
 	}
 	public void sendMoveMessages(UUID clientID, String[] position) { 

@@ -49,8 +49,9 @@ public class ProtocolClient extends GameConnectionClient {
 				UUID ghostID = UUID.fromString(messageTokens[1]);
 				removeGhostAvatar(ghostID);
 			}
-			if ((messageTokens[0].compareTo("dsfr") == 0 ) // receive "dsfr"
-			 || (messageTokens[0].compareTo("create")==0)) { // format: create, remoteId, x,y,z or dsfr, remoteId, x,y,z
+			//if ((messageTokens[0].compareTo("dsfr") == 0 ) // receive "dsfr"
+			// || (messageTokens[0].compareTo("create")==0)) { // format: create, remoteId, x,y,z or dsfr, remoteId, x,y,z
+			if (messageTokens[0].compareTo("create") == 0) {
 				UUID ghostID = UUID.fromString(messageTokens[1]);
 				Vector3 ghostPosition = Vector3f.createFrom(
 					Float.parseFloat(messageTokens[2]),
@@ -62,11 +63,11 @@ public class ProtocolClient extends GameConnectionClient {
 					System.out.println("error creating ghost avatar");
 				} 
 			}
-			if(messageTokens[0].compareTo("create") == 0) { // receive "create"  
+			if(messageTokens[0].compareTo("dsfr") == 0) { // receive "dsfr"
 				// etc….. 
 			}
 			if(messageTokens[0].compareTo("wsds") == 0) { // receive "want"
-				// etc….. 
+				
 			}
 			if(messageTokens[0].compareTo("move") == 0) { // receive "move" 
 				// etc….. 
@@ -83,6 +84,10 @@ public class ProtocolClient extends GameConnectionClient {
 		// TODO Auto-generated method stub
 		ghostAvatars.add(new GhostAvatar(ghostID, ghostPosition));
 		
+	}
+	
+	public int getNumGhosts() {
+		return ghostAvatars.size();
 	}
 
 	/*Also need functions to instantiate ghost avatar, remove a ghost avatar,
