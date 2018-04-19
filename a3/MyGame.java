@@ -26,12 +26,13 @@ import javax.script.*;
 import java.net.InetAddress;
 
 import ray.networking.IGameConnection.ProtocolType;	// import networking
-
 import java.util.Iterator;
 import java.util.UUID;								// import networking
 import java.io.IOException;							// import networking
 import java.net.InetAddress;						// import networking
 import java.net.UnknownHostException;				// import networking
+
+import static ray.rage.scene.SkeletalEntity.EndType.*;
 import java.util.Vector;
 
 class MyGame extends VariableFrameRateGame {
@@ -69,7 +70,7 @@ class MyGame extends VariableFrameRateGame {
 
 	public static void main(String[] args) {
 		//game = new MyGame(args[0], Integer.parseInt(args[1]));	//Needs to have assets and a3 in the same directory.
-		game = new MyGame("130.86.15.156", 8000);
+		game = new MyGame("130.86.65.148", 8000);
 		//Client client;
 		try {
 			game.startup();
@@ -121,11 +122,37 @@ class MyGame extends VariableFrameRateGame {
 				readScript(jsEngine, MAP_TEXTURE_SCRIPT));
 		orbitCamera = new OrbitCameraController(cameraNode, player.getNode(), cam);
 		setupSkybox(eng, sm);
-		ManualObject sea = ManualGraphics.makePlane("default.mtl", "default.png", Color.BLUE);
+		
+		/*ManualObject sea = ManualGraphics.makePlane("default.mtl", "default.png", Color.BLUE);
 		SceneNode seaNode = sm.getRootSceneNode().createChildSceneNode("SeaNode");
 		seaNode.attachObject(sea);
 		seaNode.scale(9999f, 9999f, 9999f);
-		seaNode.moveUp(0.05f);
+		seaNode.moveUp(0.05f);*/
+		//Entity wall = sm.createEntity("brickwall", "wall.obj");
+		/*SceneNode wallNode = sm.getRootSceneNode().createChildSceneNode("wallNode");
+		wallNode.scale(0.1f, 0.1f, 0.1f);
+		RenderSystem rs = sm.getRenderSystem();
+		Texture tex = sm.getTextureManager().getAssetByPath("WornBrownBrickwork_1024.png");
+		TextureState tstate = (TextureState) sm.getRenderSystem().createRenderState(RenderState.Type.TEXTURE);
+		tstate.setTexture(tex);
+		wall.setRenderState(tstate);
+		wallNode.attachObject(wall);*/
+		
+		SkeletalEntity man4Entity = sm.createSkeletalEntity("man4", "man4.rkm", "man4.rks");
+		SceneNode man4Node = sm.getRootSceneNode().createChildSceneNode("man4Node");
+		man4Node.moveUp(0.1f);
+		man4Node.scale(0.1f, 0.1f, 0.1f);
+		man4Node.attachObject(man4Entity);
+		man4Entity.loadAnimation("man4_walk", "man4_walk.rka");
+		man4Entity.loadAnimation("man4_hit", "man4_hit.rka");
+		RenderSystem rs = sm.getRenderSystem();
+		Texture tex = sm.getTextureManager().getAssetByPath("man4.png");
+		TextureState tstate = (TextureState) sm.getRenderSystem().createRenderState(RenderState.Type.TEXTURE);
+		tstate.setTexture(tex);
+		man4Entity.setRenderState(tstate);
+		
+		
+		man4Entity.playAnimation("man4_walk", 0.5f, LOOP, 0);
 	}
 
 	private void setupSkybox(Engine eng, SceneManager sm) throws IOException {
@@ -195,6 +222,7 @@ class MyGame extends VariableFrameRateGame {
 			break;
 		case KeyEvent.VK_W:
 			player.setMoveForward(true);
+			//this.doNWalk();
 			break;
 		case KeyEvent.VK_S:
 			player.setMoveBackward(true);
@@ -234,6 +262,7 @@ class MyGame extends VariableFrameRateGame {
 			break;
 		case KeyEvent.VK_W:
 			player.setMoveForward(false);
+			this.doNWalk();
 			break;
 		case KeyEvent.VK_S:
 			player.setMoveBackward(false);
@@ -256,7 +285,27 @@ class MyGame extends VariableFrameRateGame {
 		case KeyEvent.VK_DOWN:
 			orbitCamera.setRotateDown(false);
 			break;
+		case KeyEvent.VK_SPACE:
+			this.doAttack();
+			break;
 		}
+	}
+	
+	private void doAttack() { 
+		SkeletalEntity manSE = (SkeletalEntity) game.getEngine().getSceneManager().getEntity("walker");
+		//SkeletalEntity manSE = (SkeletalEntity) game.getEngine().getSceneManager().getEntity("man4");
+		manSE.playAnimation("attack", 0.5f, STOP, 0);
+		//manSE.stopAnimation();
+		//manSE.playAnimation("man4_hit", 0.5f, LOOP, 0);
+		
+	}
+	
+	private void doNWalk() { 
+		SkeletalEntity manSE = (SkeletalEntity) game.getEngine().getSceneManager().getEntity("walker");
+		//SkeletalEntity manSE = (SkeletalEntity) game.getEngine().getSceneManager().getEntity("man4");
+		manSE.stopAnimation();
+		manSE.playAnimation("normal_walk", 0.5f, LOOP, 0);
+		//manSE.playAnimation("man4_walk", 0.5f, LOOP, 0);
 	}
 
 	@Override
@@ -266,6 +315,14 @@ class MyGame extends VariableFrameRateGame {
 		player.update(map, seconds);
 		orbitCamera.update(seconds);
 		processNetworking(elapsTime);
+		
+		//Updating skeletalentity animations
+		SkeletalEntity playerEntity = (SkeletalEntity) engine.getSceneManager().getEntity("walker");
+		SkeletalEntity manEntity = (SkeletalEntity) game.getEngine().getSceneManager().getEntity("man4");
+		playerEntity.update();
+		manEntity.update();
+
+		
 	}
 	
 	public void setIsConnected(boolean b) {

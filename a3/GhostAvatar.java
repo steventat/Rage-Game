@@ -27,11 +27,16 @@ public class GhostAvatar {
 		this.id = id;
 		this.position = position;
 		try {
-			this.setEntity(sm.createEntity("ghostEntity" + game.getNumGhosts() + 1, MODEL));
+			this.setEntity(sm.createEntity("ghostEntity" + id, MODEL));
+			this.setNode(sm.createSceneNode("ghost" + id));
+			this.getNode().scale(0.1f, 0.1f, 0.1f);
+			this.getNode().attachObject(this.getEntity());
+			this.setPosition(position);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.setNode(sm.getRootSceneNode().createChildSceneNode("ghostNode" + game.getNumGhosts() + 1));
+		System.out.println("Attaching to node");
+		this.setNode(sm.getRootSceneNode().createChildSceneNode("ghostNode" + id));
 	}
 	
 	// accessors and setters for id, node, entity, and position . . .
@@ -55,7 +60,11 @@ public class GhostAvatar {
 	public Entity getEntity() {
 		return entity;
 	}
-	public Vector3 getPosition(Vector3 position) {
+	public void setPosition(Vector3 position) {
+		node.setLocalPosition(position.x(), position.y(), position.z());
+	}
+	
+	public Vector3 getPosition( ) {
 		return position;
 	}
 }

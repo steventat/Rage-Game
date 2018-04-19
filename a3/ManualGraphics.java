@@ -77,10 +77,12 @@ class ManualGraphics {
 	public static ManualObject makePlane(String materialPath, String texturePath, Color color) throws IOException {
 		Engine eng = MyGame.getGame().getEngine();
 		SceneManager sm = MyGame.getGame().getSceneManager();
+		RenderSystem rs = sm.getRenderSystem();
+	    ZBufferState zstate = (ZBufferState) rs.createRenderState(RenderState.Type.ZBUFFER);
+	    zstate.setTestEnabled(true);
 		ManualObject plane = sm.createManualObject("Plane" + number++);
 		ManualObjectSection planeSec = plane.createManualSection("PlaneSection");
-		plane.setGpuShaderProgram(sm.getRenderSystem().
-				getGpuShaderProgram(GpuShaderProgram.Type.RENDERING));
+		plane.setGpuShaderProgram(rs.getGpuShaderProgram(GpuShaderProgram.Type.RENDERING));
 		float[] vertices = { -1f,  0f,  1f,  1f,  0f, -1f, -1f,  0f, -1f,
 				     -1f,  0f,  1f,  1f,  0f,  1f,  1f,  0f, -1f };
 		float[] texCoords = { 0f,  1f,  0f,  0f,  1f,  0f,
@@ -104,6 +106,7 @@ class ManualGraphics {
 			createRenderState(RenderState.Type.TEXTURE);
 		texState.setTexture(tex);
 		plane.setDataSource(DataSource.INDEX_BUFFER);
+		plane.setRenderState(zstate);
 		planeSec.setRenderState(texState);
 		planeSec.setMaterial(mat);
 		plane.setPrimitive(Primitive.TRIANGLES);

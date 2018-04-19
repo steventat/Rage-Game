@@ -18,6 +18,7 @@ public class ProtocolClient extends GameConnectionClient {
 	private MyGame game;
 	private UUID id;
 	private Vector<GhostAvatar> ghostAvatars;
+	private int numGhosts;
 	
 	public ProtocolClient(InetAddress remAddr, int remPort,
 	ProtocolType pType, MyGame game) throws IOException { 
@@ -52,12 +53,14 @@ public class ProtocolClient extends GameConnectionClient {
 			//if ((messageTokens[0].compareTo("dsfr") == 0 ) // receive "dsfr"
 			// || (messageTokens[0].compareTo("create")==0)) { // format: create, remoteId, x,y,z or dsfr, remoteId, x,y,z
 			if (messageTokens[0].compareTo("create") == 0) {
+				System.out.println("Obtained create message");
 				UUID ghostID = UUID.fromString(messageTokens[1]);
 				Vector3 ghostPosition = Vector3f.createFrom(
 					Float.parseFloat(messageTokens[2]),
 					Float.parseFloat(messageTokens[3]),
 					Float.parseFloat(messageTokens[4]));
-				try { 
+				try {
+					System.out.println("Creating ghost avatar");
 					createGhostAvatar(ghostID, ghostPosition);
 				} catch (IOException e) { 
 					System.out.println("error creating ghost avatar");
@@ -82,12 +85,13 @@ public class ProtocolClient extends GameConnectionClient {
 
 	private void createGhostAvatar(UUID ghostID, Vector3 ghostPosition) throws IOException {
 		// TODO Auto-generated method stub
+		numGhosts++;
 		ghostAvatars.add(new GhostAvatar(ghostID, ghostPosition));
 		
 	}
 	
 	public int getNumGhosts() {
-		return ghostAvatars.size();
+		return numGhosts;
 	}
 
 	/*Also need functions to instantiate ghost avatar, remove a ghost avatar,
