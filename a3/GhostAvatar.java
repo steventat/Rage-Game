@@ -31,7 +31,7 @@ public class GhostAvatar {
 			this.setNode(sm.createSceneNode("ghost" + id));
 			this.getNode().scale(0.1f, 0.1f, 0.1f);
 			this.getNode().attachObject(this.getEntity());
-			this.setPosition(position);
+			this.setLocalPosition(position);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -60,7 +60,7 @@ public class GhostAvatar {
 	public Entity getEntity() {
 		return entity;
 	}
-	public void setPosition(Vector3 position) {
+	public void setLocalPosition(Vector3 position) {
 		node.setLocalPosition(position.x(), position.y(), position.z());
 	}
 	

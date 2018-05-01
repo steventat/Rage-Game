@@ -80,14 +80,20 @@ public class ProtocolClient extends GameConnectionClient {
 	
 	private void removeGhostAvatar(UUID ghostID) {
 		// TODO Auto-generated method stub
+		//game.removeGhostAvatarFromGameWorld(avatar);
 		
 	}
 
 	private void createGhostAvatar(UUID ghostID, Vector3 ghostPosition) throws IOException {
 		// TODO Auto-generated method stub
 		numGhosts++;
-		ghostAvatars.add(new GhostAvatar(ghostID, ghostPosition));
-		
+		try {
+			GhostAvatar ghost = new GhostAvatar(ghostID, ghostPosition);
+			ghostAvatars.add(ghost);
+			game.addGhostAvatarToGameWorld(ghost);
+		} catch (IOException e) { 
+			e.printStackTrace();
+		}
 	}
 	
 	public int getNumGhosts() {

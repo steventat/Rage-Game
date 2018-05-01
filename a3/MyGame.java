@@ -368,4 +368,36 @@ class MyGame extends VariableFrameRateGame {
 			System.out.print("Not connected");
 			return 0;
 	}
+	
+	public void addGhostAvatarToGameWorld(GhostAvatar avatar) throws IOException { 
+		if (avatar != null) { 
+			/*Entity ghostE = sm.createEntity("ghost", "whatever.obj");
+			ghostE.setPrimitive(Primitive.TRIANGLES);
+			SceneNode ghostN = sm.getRootSceneNode().
+			createChildSceneNode(avatar.getID().toString());
+			ghostN.attachObject(ghostE);
+			ghostN.setLocalPosition();
+			avatar.setNode(ghostN);
+			avatar.setEntity(ghostE);
+			//avatar.setPosition(node’s position... maybe redundant);*/
+		}
+		else {
+			
+		}
+	}
+	
+	public void removeGhostAvatarFromGameWorld(GhostAvatar avatar) { 
+		if(avatar != null) gameObjectsToRemove.add(avatar.getID());
+	}
 }
+
+
+/*private class SendCloseConnectionPacketAction extends AbstractInputAction { // for leaving the game... need to attach to an input device
+	
+	@Override
+	public void performAction(float time, Event evt) { 
+		if(protClient != null && isClientConnected == true) { 
+			protClient.sendByeMessage();
+		} 
+	}
+}*/
