@@ -171,24 +171,27 @@ class MyGame extends VariableFrameRateGame {
 		
         // physics
         SceneNode rootNode = sm.getRootSceneNode();         
+        
         // Ball 1
         Entity ball1Entity = sm.createEntity("ball1", "earth.obj");
         ball1Node = rootNode.createChildSceneNode("Ball1Node");
         ball1Node.attachObject(ball1Entity);
         //ball1Node.setLocalPosition(0, 2, -2);  // original position
         ball1Node.setLocalPosition(0, 3, -2);
+        
         // Ball 2
         Entity ball2Entity = sm.createEntity("Ball2", "cone.obj"); // cone.obj as 2nd ball
         ball2Node = rootNode.createChildSceneNode("Ball2Node");
         ball2Node.attachObject(ball2Entity);
         //ball2Node.setLocalPosition(-1,10,-2); // original position 
         ball2Node.setLocalPosition(-1,2,-2); 
-        // Ground plane
+        
+        // Ground plane       
         Entity groundEntity = sm.createEntity(GROUND_E, "cube.obj");
         groundNode = rootNode.createChildSceneNode(GROUND_N);
         groundNode.attachObject(groundEntity);
-        //groundNode.setLocalPosition(0, -7, -2); // original position
-        groundNode.setLocalPosition(0, 0, 0);       // set ground to xyz to 0
+        groundNode.setLocalPosition(0, -7, -2); // original position
+        //groundNode.setLocalPosition(0, 0, 0);       // set ground to xyz to 0
         initPhysicsSystem();
         createRagePhysicsWorld();
          
@@ -284,6 +287,12 @@ class MyGame extends VariableFrameRateGame {
 			break;
 		case KeyEvent.VK_DOWN:
 			orbitCamera.setRotateDown(true);
+			break;
+		case KeyEvent.VK_Q:
+			orbitCamera.moveFurther(0.5f);
+			break;
+		case KeyEvent.VK_E:
+			orbitCamera.moveCloser(0.5f);
 			break;
 		case KeyEvent.VK_P:                     // Press 'P' to enable Physics
             System.out.println("Starting Physics!");
@@ -451,65 +460,60 @@ class MyGame extends VariableFrameRateGame {
 		if(avatar != null) gameObjectsToRemove.add(avatar.getID());
 	}
 	
-	   private void initPhysicsSystem()
-	    { 
-	        String engine = "ray.physics.JBullet.JBulletPhysicsEngine";
-	        float[] gravity = {0, -3f, 0};
-	        physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
-	        physicsEngine.initSystem();
-	        physicsEngine.setGravity(gravity);
-	    }
-	 
-	    private void createRagePhysicsWorld()
-	    { 
-	        float mass = 1.0f;
-	        float up[] = {0,1,0};
-	        double[] temptf;
-	         
-	        temptf = toDoubleArray(ball1Node.getLocalTransform().toFloatArray());
-	        ball1PhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
-	        ball1PhysObj.setBounciness(1.0f);
-	        ball1Node.setPhysicsObject(ball1PhysObj);
-	        temptf = toDoubleArray(ball2Node.getLocalTransform().toFloatArray());
-	        ball2PhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
-	        ball2PhysObj.setBounciness(1.0f);
-	        ball2Node.setPhysicsObject(ball2PhysObj);
-	        temptf = toDoubleArray(groundNode.getLocalTransform().toFloatArray());
-	        groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),temptf, up, 0.0f);
-	        groundPlaneP.setBounciness(1.0f);
-	        groundNode.scale(3f, .05f, 3f);
-	        groundNode.setLocalPosition(0, -7, -2);
-	        groundNode.setPhysicsObject(groundPlaneP);
-	        // can also set damping, friction, etc.
-	    }
-	 
-	 
-	 
-	    private float[] toFloatArray(double[] arr)
-	    { 
-	        if (arr == null) 
-	            return null;
-	        int n = arr.length;
-	        float[] ret = new float[n];
-	        for (int i = 0; i < n; i++)
-	        { 
-	            ret[i] = (float)arr[i];
-	        }
-	        return ret;
-	    }
-	 
-	    private double[] toDoubleArray(float[] arr)
-	    { 
-	        if (arr == null) 
-	            return null;
-	        int n = arr.length;
-	        double[] ret = new double[n];
-	        for (int i = 0; i < n; i++)
-	        { 
-	            ret[i] = (double)arr[i];
-	        }
-	        return ret;
-	    }
+	private void initPhysicsSystem() { 
+		String engine = "ray.physics.JBullet.JBulletPhysicsEngine";
+		float[] gravity = {0, -3f, 0};
+		physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
+		physicsEngine.initSystem();
+		physicsEngine.setGravity(gravity);
+    }
+ 
+	private void createRagePhysicsWorld() { 
+		float mass = 1.0f;
+		float up[] = {0,1,0};
+		double[] temptf;
+         
+		temptf = toDoubleArray(ball1Node.getLocalTransform().toFloatArray());
+		ball1PhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
+       	ball1PhysObj.setBounciness(1.0f);
+       	ball1Node.setPhysicsObject(ball1PhysObj);
+        
+       	temptf = toDoubleArray(ball2Node.getLocalTransform().toFloatArray());
+       	ball2PhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
+       	ball2PhysObj.setBounciness(1.0f);
+       	ball2Node.setPhysicsObject(ball2PhysObj);
+        
+       	temptf = toDoubleArray(groundNode.getLocalTransform().toFloatArray());
+       	groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),temptf, up, 0.0f);
+       	groundPlaneP.setBounciness(1.0f);
+       	groundNode.scale(3f, .05f, 3f);
+       	groundNode.setLocalPosition(0, -7, -2);
+       	groundNode.setPhysicsObject(groundPlaneP);
+       	// can also set damping, friction, etc.
+   }
+   private float[] toFloatArray(double[] arr)
+   { 
+       	if (arr == null) 
+       		return null;
+       	int n = arr.length;
+       	float[] ret = new float[n];
+       	for (int i = 0; i < n; i++)
+       	{ 
+       		ret[i] = (float)arr[i];
+       	}
+       	return ret;
+   }
+ 
+   private double[] toDoubleArray(float[] arr) { 
+	   if (arr == null) 
+		   return null;
+	   int n = arr.length;
+	   double[] ret = new double[n];
+	   for (int i = 0; i < n; i++) { 
+		   ret[i] = (double)arr[i];
+	   }
+	   return ret;
+   }
 }
 
 
