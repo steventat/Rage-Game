@@ -329,6 +329,12 @@ class MyGame extends VariableFrameRateGame {
 		case KeyEvent.VK_DOWN:
 			orbitCamera.setRotateDown(false);
 			break;
+		case KeyEvent.VK_Q:
+			orbitCamera.moveFurther(0.5f);
+			break;
+		case KeyEvent.VK_E:
+			orbitCamera.moveCloser(0.5f);
+			break;
 		case KeyEvent.VK_SPACE:
 			this.doAttack();
 			break;
