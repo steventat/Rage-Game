@@ -456,6 +456,21 @@ class MyGame extends VariableFrameRateGame {
 		}
 	}
 	
+	public void addGhostNPCtoGameWorld(GhostNPC npc) {
+		//Has a problem with id. Should it be an int or an UUID? Prof code has as an int. 
+		/*if (npc != null) { 
+			Entity ghostE = sm.createEntity("ghost", "dolphinHighPoly.obj");
+			ghostE.setPrimitive(Primitive.TRIANGLES);
+			SceneNode ghostN = sm.getRootSceneNode().
+			createChildSceneNode(npc.getID().toString());
+			ghostN.attachObject(ghostE);
+			ghostN.setLocalPosition(npc.getPosition());
+			npc.setNode(ghostN);
+			npc.setEntity(ghostE);
+			//avatar.setPosition(node’s position... maybe redundant);
+		}*/
+	}
+	
 	public void removeGhostAvatarFromGameWorld(GhostAvatar avatar) { 
 		if(avatar != null) gameObjectsToRemove.add(avatar.getID());
 	}

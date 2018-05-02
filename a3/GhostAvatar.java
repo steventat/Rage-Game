@@ -18,6 +18,7 @@ public class GhostAvatar {
 	private SceneNode node;
 	private Entity entity;
 	Vector3 position;
+	//private Vector3 position;
 	private MyGame game = MyGame.getGame();
 	private SceneManager sm = game.getSceneManager();
 	static final String MODEL = "dolphinHighPoly.obj";
