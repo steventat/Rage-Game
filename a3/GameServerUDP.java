@@ -54,7 +54,9 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 			}
 			// case where server receives a DETAILS-FOR message
 			if (msgTokens[0].compareTo("dsfr") == 0) { 
-				// etc….. 
+				System.out.println("Received from Details for message" + msgTokens[1]);
+	
+				
 			}
 			// case where server receives a MOVE message
 			if (msgTokens[0].compareTo("move") == 0) { 

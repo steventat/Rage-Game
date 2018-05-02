@@ -35,6 +35,11 @@ import java.net.UnknownHostException;				// import networking
 import static ray.rage.scene.SkeletalEntity.EndType.*;
 import java.util.Vector;
 
+import ray.physics.PhysicsEngine;           // import physics
+import ray.physics.PhysicsObject;           // import physics
+import ray.physics.PhysicsEngineFactory;    // import physics
+ 
+
 class MyGame extends VariableFrameRateGame {
 	
 	private static MyGame game;
@@ -55,6 +60,15 @@ class MyGame extends VariableFrameRateGame {
 	private boolean isClientConnected;		// network
 	private Vector<UUID> gameObjectsToRemove;	// network
 
+    private SceneNode ball1Node, ball2Node, groundNode; // physics
+    private SceneNode cameraPositionNode;               //  physics
+    private final static String GROUND_E = "Ground";    //  physics
+    private final static String GROUND_N = "GroundNode";//  physics
+    private PhysicsEngine physicsEngine;                    //  physics
+    private PhysicsObject ball1PhysObj, ball2PhysObj, groundPlaneP; // physics
+    private boolean running = false;                    //  physics
+     
+	
 	//I'll leave this static because I wouldn't want two MyGames
 	public static MyGame getGame() {
 		return game;
@@ -70,7 +84,7 @@ class MyGame extends VariableFrameRateGame {
 
 	public static void main(String[] args) {
 		//game = new MyGame(args[0], Integer.parseInt(args[1]));	//Needs to have assets and a3 in the same directory.
-		game = new MyGame("130.86.65.148", 8000);
+		game = new MyGame("130.86.65.78", 8000);
 		//Client client;
 		try {
 			game.startup();
@@ -153,6 +167,32 @@ class MyGame extends VariableFrameRateGame {
 		
 		
 		man4Entity.playAnimation("man4_walk", 0.5f, LOOP, 0);
+		
+		
+        // physics
+        SceneNode rootNode = sm.getRootSceneNode();         
+        // Ball 1
+        Entity ball1Entity = sm.createEntity("ball1", "earth.obj");
+        ball1Node = rootNode.createChildSceneNode("Ball1Node");
+        ball1Node.attachObject(ball1Entity);
+        //ball1Node.setLocalPosition(0, 2, -2);  // original position
+        ball1Node.setLocalPosition(0, 3, -2);
+        // Ball 2
+        Entity ball2Entity = sm.createEntity("Ball2", "cone.obj"); // cone.obj as 2nd ball
+        ball2Node = rootNode.createChildSceneNode("Ball2Node");
+        ball2Node.attachObject(ball2Entity);
+        //ball2Node.setLocalPosition(-1,10,-2); // original position 
+        ball2Node.setLocalPosition(-1,2,-2); 
+        // Ground plane
+        Entity groundEntity = sm.createEntity(GROUND_E, "cube.obj");
+        groundNode = rootNode.createChildSceneNode(GROUND_N);
+        groundNode.attachObject(groundEntity);
+        //groundNode.setLocalPosition(0, -7, -2); // original position
+        groundNode.setLocalPosition(0, 0, 0);       // set ground to xyz to 0
+        initPhysicsSystem();
+        createRagePhysicsWorld();
+         
+        System.out.println("Press P to start the physics engine!");
 	}
 
 	private void setupSkybox(Engine eng, SceneManager sm) throws IOException {
@@ -245,6 +285,10 @@ class MyGame extends VariableFrameRateGame {
 		case KeyEvent.VK_DOWN:
 			orbitCamera.setRotateDown(true);
 			break;
+		case KeyEvent.VK_P:                     // Press 'P' to enable Physics
+            System.out.println("Starting Physics!");
+            running = true;
+            break;
 		}
 	}
 
@@ -304,7 +348,7 @@ class MyGame extends VariableFrameRateGame {
 		SkeletalEntity manSE = (SkeletalEntity) game.getEngine().getSceneManager().getEntity("walker");
 		//SkeletalEntity manSE = (SkeletalEntity) game.getEngine().getSceneManager().getEntity("man4");
 		manSE.stopAnimation();
-		manSE.playAnimation("normal_walk", 0.5f, LOOP, 0);
+		manSE.playAnimation("normal_walk", 0.5f, STOP, 0);
 		//manSE.playAnimation("man4_walk", 0.5f, LOOP, 0);
 	}
 
@@ -322,6 +366,20 @@ class MyGame extends VariableFrameRateGame {
 		playerEntity.update();
 		manEntity.update();
 
+        // physics
+        if (running)    
+        { 
+            Matrix4 mat;
+            physicsEngine.update(elapsTime);
+            for (SceneNode s : engine.getSceneManager().getSceneNodes())
+            { 
+                if (s.getPhysicsObject() != null)
+                { 
+                    mat = Matrix4f.createFrom(toFloatArray(s.getPhysicsObject().getTransform()));
+                s.setLocalPosition(mat.value(0,3),mat.value(1,3),mat.value(2,3));
+                } 
+            } 
+        } 
 		
 	}
 	
@@ -371,24 +429,81 @@ class MyGame extends VariableFrameRateGame {
 	
 	public void addGhostAvatarToGameWorld(GhostAvatar avatar) throws IOException { 
 		if (avatar != null) { 
-			/*Entity ghostE = sm.createEntity("ghost", "whatever.obj");
+			Entity ghostE = sm.createEntity("ghost", "dolphinHighPoly.obj");
 			ghostE.setPrimitive(Primitive.TRIANGLES);
 			SceneNode ghostN = sm.getRootSceneNode().
 			createChildSceneNode(avatar.getID().toString());
 			ghostN.attachObject(ghostE);
-			ghostN.setLocalPosition();
+			ghostN.setLocalPosition(avatar.getPosition());
 			avatar.setNode(ghostN);
 			avatar.setEntity(ghostE);
-			//avatar.setPosition(node’s position... maybe redundant);*/
-		}
-		else {
-			
+			//avatar.setPosition(node’s position... maybe redundant);
 		}
 	}
 	
 	public void removeGhostAvatarFromGameWorld(GhostAvatar avatar) { 
 		if(avatar != null) gameObjectsToRemove.add(avatar.getID());
 	}
+	
+	   private void initPhysicsSystem()
+	    { 
+	        String engine = "ray.physics.JBullet.JBulletPhysicsEngine";
+	        float[] gravity = {0, -3f, 0};
+	        physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
+	        physicsEngine.initSystem();
+	        physicsEngine.setGravity(gravity);
+	    }
+	 
+	    private void createRagePhysicsWorld()
+	    { 
+	        float mass = 1.0f;
+	        float up[] = {0,1,0};
+	        double[] temptf;
+	         
+	        temptf = toDoubleArray(ball1Node.getLocalTransform().toFloatArray());
+	        ball1PhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
+	        ball1PhysObj.setBounciness(1.0f);
+	        ball1Node.setPhysicsObject(ball1PhysObj);
+	        temptf = toDoubleArray(ball2Node.getLocalTransform().toFloatArray());
+	        ball2PhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
+	        ball2PhysObj.setBounciness(1.0f);
+	        ball2Node.setPhysicsObject(ball2PhysObj);
+	        temptf = toDoubleArray(groundNode.getLocalTransform().toFloatArray());
+	        groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),temptf, up, 0.0f);
+	        groundPlaneP.setBounciness(1.0f);
+	        groundNode.scale(3f, .05f, 3f);
+	        groundNode.setLocalPosition(0, -7, -2);
+	        groundNode.setPhysicsObject(groundPlaneP);
+	        // can also set damping, friction, etc.
+	    }
+	 
+	 
+	 
+	    private float[] toFloatArray(double[] arr)
+	    { 
+	        if (arr == null) 
+	            return null;
+	        int n = arr.length;
+	        float[] ret = new float[n];
+	        for (int i = 0; i < n; i++)
+	        { 
+	            ret[i] = (float)arr[i];
+	        }
+	        return ret;
+	    }
+	 
+	    private double[] toDoubleArray(float[] arr)
+	    { 
+	        if (arr == null) 
+	            return null;
+	        int n = arr.length;
+	        double[] ret = new double[n];
+	        for (int i = 0; i < n; i++)
+	        { 
+	            ret[i] = (double)arr[i];
+	        }
+	        return ret;
+	    }
 }
 
 

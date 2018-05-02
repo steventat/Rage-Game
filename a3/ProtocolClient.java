@@ -70,7 +70,7 @@ public class ProtocolClient extends GameConnectionClient {
 				// etc….. 
 			}
 			if(messageTokens[0].compareTo("wsds") == 0) { // receive "want"
-				
+				this.sendDetailsForMessage(UUID.fromString(messageTokens[1]), game.getPlayerPosition());
 			}
 			if(messageTokens[0].compareTo("move") == 0) { // receive "move" 
 				// etc….. 
@@ -129,9 +129,21 @@ public class ProtocolClient extends GameConnectionClient {
 	// etc….. 
 	}
 	public void sendDetailsForMessage(UUID remId, Vector3 pos) { 
-	// etc….. 
+		try { 	
+			String message = new String("dsfr," + remId.toString());
+			message += "," + pos.x()+"," + pos.y() + "," + pos.z();
+			System.out.println("Sending Details For message\n");
+			sendPacket(message);
+		}
+		catch (IOException e) { 
+			e.printStackTrace();
+		}
 	}
 	public void sendMoveMessage(Vector3 pos) { 
 	// etc….. 
+	}
+	
+	public UUID getID() {
+		return id;
 	}
 }
