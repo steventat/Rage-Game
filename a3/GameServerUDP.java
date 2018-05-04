@@ -2,6 +2,10 @@ package a3;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.UUID;
 import ray.networking.server.GameConnectionServer;
 import ray.networking.server.IClientInfo;
@@ -23,7 +27,7 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 					IClientInfo ci;
 					ci = getServerSocket().createClientInfo(senderIP, senderPort);
 					UUID clientID = UUID.fromString(msgTokens[1]);
-					addClient(ci, clientID);
+					addClient(ci, clientID);	//Adding new client to the client table. Important for lookup.
 					System.out.println("Obtained join message from " + clientID + "\n");
 					sendJoinedMessage(clientID, true);
 			 } 	catch (IOException e) {
@@ -55,8 +59,34 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 			// case where server receives a DETAILS-FOR message
 			if (msgTokens[0].compareTo("dsfr") == 0) { 
 				System.out.println("Received from Details for message" + msgTokens[1]);
-	
-				
+				IClientInfo ci;
+				try {
+					ci = getServerSocket().createClientInfo(senderIP, senderPort);
+					Map<UUID, IClientInfo> clientTable = new HashMap<UUID, IClientInfo>();
+					clientTable = this.getClients(); //Need to look up the UUID of the received client's details.
+					UUID clientID = UUID.fromString(msgTokens[1]);
+					UUID remoteId = null;
+					String[] position = {
+						msgTokens[2],
+						msgTokens[3],
+						msgTokens[4]
+					};
+					if(clientTable.containsValue(ci)) {
+						Iterator<Entry<UUID, IClientInfo>> it = clientTable.entrySet().iterator();
+					    while (it.hasNext()) {
+					        Map.Entry pair = (Map.Entry)it.next();
+					        if(pair.getValue() == ci) {
+					        	remoteId = (UUID) pair.getKey();
+					        }
+					    }
+						this.sendDetailsMsg(clientID, remoteId, position);
+					}
+					else {
+						System.out.println("Error: Could not look up received client from details for.");
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			// case where server receives a MOVE message
 			if (msgTokens[0].compareTo("move") == 0) { 
@@ -90,7 +120,16 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 		}
 	}
 	public void sendDetailsMsg(UUID clientID, UUID remoteId, String[] position) {
-		// etc….. 
+		System.out.println("Sending details for message to: " + clientID);
+		try {
+			String message = new String("dsfr," + remoteId.toString());
+			message += "," + position[0];
+			message += "," + position[1];
+			message += "," + position[2];
+			sendPacket(message, clientID);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	
 	}
 	public void sendWantsDetailsMessages(UUID clientID) { 

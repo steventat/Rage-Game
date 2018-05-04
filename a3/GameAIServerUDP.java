@@ -22,8 +22,8 @@ public class GameAIServerUDP extends GameConnectionServer<UUID> {
 		
 		if (messageTokens.length > 0) {
 	
-			if(messageTokens[0].compareTo("needNPC") == 0) { 
-		    	//. . .
+			if(messageTokens[0].compareTo("needNPC") == 0) {
+				sendNPCinfo();
 		    }
 		    if(messageTokens[0].compareTo("collide") == 0)
 		    { 
@@ -47,5 +47,17 @@ public class GameAIServerUDP extends GameConnectionServer<UUID> {
 			}
 	    }
 	}
+	
+	/*public void sendCreateMessages(int npcID, String[] position) { // format: create, remoteId, x, y, z
+ 		try {
+ 			String message = new String("cnpc," + Integer.toString(npcID));
+ 			message += "," + position[0];
+ 			message += "," + position[1];
+ 			message += "," + position[2];
+ 			sendPacketToAll(message);
+ 		} catch (IOException e) {
+ 			e.printStackTrace();
+ 		}
+ 	}*/
 }
            

@@ -19,6 +19,7 @@ class Player extends Moveable {
 
 	public Player(SceneManager sm) throws IOException {
 		super(makeNode(sm), (Vector3f)Vector3f.createFrom(SPEED, 0f, SPEED), true, ANGULAR_SPEED);
+		
 	}
 
 	private static SceneNode makeNode(SceneManager sm) throws IOException {
@@ -36,6 +37,7 @@ class Player extends Moveable {
 		TextureState tstate = (TextureState) sm.getRenderSystem().createRenderState(RenderState.Type.TEXTURE);
 		tstate.setTexture(tex);
 		playerEntity.setRenderState(tstate);
+		MyGame.setPlayerNode(playerNode);	//Need to pass playernode to MyGame to attach to physicsObject.
 		return playerNode;
 		
 		/*SkeletalEntity man4Entity = sm.createSkeletalEntity("man4", "man4.rkm", "man4.rks");

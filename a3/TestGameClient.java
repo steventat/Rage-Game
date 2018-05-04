@@ -24,7 +24,7 @@ public class TestGameClient extends GameConnectionClient { // same as before, pl
 		this.ghostNPCs = new Vector<GhostNPC>();
 	}
     
-     private void createGhostNPC(int id, Vector3 position)
+     private void createGhostNPC(int id, Vector3 position) throws IOException
      { 
          GhostNPC newNPC = new GhostNPC(id, position);
          ghostNPCs.add(newNPC);
@@ -60,9 +60,30 @@ public class TestGameClient extends GameConnectionClient { // same as before, pl
 	            Float.parseFloat(messageTokens[2]),
 	            Float.parseFloat(messageTokens[2]),
 	            Float.parseFloat(messageTokens[2]));
+	            
+	            //Checking to see if there are any NPCs.
+	            if(ghostNPCs.size() != 0) {
+	            	for(GhostNPC npc: ghostNPCs) {
+	            		//if
+	            	}
+	            }
 	            updateGhostNPC(ghostID, ghostPosition);
 	         }
     	 }
+    	 /*if (messageTokens[0].compareTo("create") == 0) {
+				System.out.println("Obtained NPC create message");
+				int ghostID = Integer.parseInt(messageTokens[1]);
+				Vector3 ghostPosition = Vector3f.createFrom(
+					Float.parseFloat(messageTokens[2]),
+					Float.parseFloat(messageTokens[3]),
+					Float.parseFloat(messageTokens[4]));
+				try {
+					System.out.println("Creating NPC ghost avatar");
+					createGhostNPC(ghostID, ghostPosition);
+				} catch (IOException e) { 
+					System.out.println("error creating NPC ghost avatar");
+				} 
+			}*/
      }
      
 }
