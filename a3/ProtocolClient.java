@@ -67,9 +67,22 @@ public class ProtocolClient extends GameConnectionClient {
 				} 
 			}
 			if(messageTokens[0].compareTo("dsfr") == 0) { // receive "dsfr"
-				// etc….. 
+				System.out.println("Obtained details for message");
+				UUID ghostID = UUID.fromString(messageTokens[1]);
+				Vector3 ghostPosition = Vector3f.createFrom(
+					Float.parseFloat(messageTokens[2]),
+					Float.parseFloat(messageTokens[3]),
+					Float.parseFloat(messageTokens[4]));
+				try {
+					System.out.println("Creating ghost avatar");
+					createGhostAvatar(ghostID, ghostPosition);
+				} catch (IOException e) {
+					System.out.println("error creating ghost avatar");
+					e.printStackTrace();
+				}
 			}
 			if(messageTokens[0].compareTo("wsds") == 0) { // receive "want"
+				System.out.println("Got wants details message");
 				this.sendDetailsForMessage(UUID.fromString(messageTokens[1]), game.getPlayerPosition());
 			}
 			if(messageTokens[0].compareTo("move") == 0) { // receive "move" 

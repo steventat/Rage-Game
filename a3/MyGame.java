@@ -67,6 +67,9 @@ class MyGame extends VariableFrameRateGame {
     private PhysicsEngine physicsEngine;                    //  physics
     private PhysicsObject ball1PhysObj, ball2PhysObj, groundPlaneP; // physics
     private boolean running = false;                    //  physics
+    
+    private static SceneNode playerNode;
+    private PhysicsObject playerPhysObj; 
      
 	
 	//I'll leave this static because I wouldn't want two MyGames
@@ -103,6 +106,10 @@ class MyGame extends VariableFrameRateGame {
 
 	public Vector3f getPlayerPosition() {
 		return player.getPosition();
+	}
+	
+	public static void setPlayerNode(SceneNode node) {
+		playerNode = node;
 	}
 
 	@Override
@@ -155,6 +162,7 @@ class MyGame extends VariableFrameRateGame {
 		SkeletalEntity man4Entity = sm.createSkeletalEntity("man4", "man4.rkm", "man4.rks");
 		SceneNode man4Node = sm.getRootSceneNode().createChildSceneNode("man4Node");
 		man4Node.moveUp(0.1f);
+		man4Node.moveLeft(2.0f);
 		man4Node.scale(0.1f, 0.1f, 0.1f);
 		man4Node.attachObject(man4Entity);
 		man4Entity.loadAnimation("man4_walk", "man4_walk.rka");
@@ -165,8 +173,27 @@ class MyGame extends VariableFrameRateGame {
 		tstate.setTexture(tex);
 		man4Entity.setRenderState(tstate);
 		
-		
 		man4Entity.playAnimation("man4_walk", 0.5f, LOOP, 0);
+		
+		SkeletalEntity robotEntity = sm.createSkeletalEntity("robot", "robot.rkm", "robot.rks");
+		SceneNode robotNode = sm.getRootSceneNode().createChildSceneNode("robotNode");
+		robotNode.moveUp(0.5f);
+		robotNode.moveRight(3.0f);
+		robotNode.scale(0.1f, 0.1f, 0.1f);
+		robotNode.attachObject(robotEntity);
+		robotEntity.loadAnimation("robot_walk", "robot_walk.rka");
+		robotEntity.loadAnimation("robot_fly", "robot_fly.rka");
+		robotEntity.loadAnimation("robot_tPlane", "robot_transformPlane.rka");
+		robotEntity.loadAnimation("robot_tRobot", "robot_transformRobot.rka");
+		Texture robotText = sm.getTextureManager().getAssetByPath("robot.png");
+		TextureState rTstate = (TextureState) sm.getRenderSystem().createRenderState(RenderState.Type.TEXTURE);
+		rTstate.setTexture(robotText);
+		robotEntity.setRenderState(rTstate);
+		
+		//robotEntity.playAnimation("robot_walk", 0.5f, STOP, 0);
+		robotEntity.playAnimation("robot_tPlane", 0.5f, LOOP, 0);
+		//robotEntity.playAnimation("robot_fly", 0.5f, LOOP, 0);
+		//robotEntity.playAnimation("robot_tRobot", 0.5f, STOP, 0);
 		
 		
         // physics
@@ -176,22 +203,22 @@ class MyGame extends VariableFrameRateGame {
         Entity ball1Entity = sm.createEntity("ball1", "earth.obj");
         ball1Node = rootNode.createChildSceneNode("Ball1Node");
         ball1Node.attachObject(ball1Entity);
-        //ball1Node.setLocalPosition(0, 2, -2);  // original position
-        ball1Node.setLocalPosition(0, 3, -2);
+        ball1Node.setLocalPosition(0, 2, -2);  // original position
+        //ball1Node.setLocalPosition(0, 3, -2);
         
         // Ball 2
         Entity ball2Entity = sm.createEntity("Ball2", "cone.obj"); // cone.obj as 2nd ball
         ball2Node = rootNode.createChildSceneNode("Ball2Node");
         ball2Node.attachObject(ball2Entity);
-        //ball2Node.setLocalPosition(-1,10,-2); // original position 
-        ball2Node.setLocalPosition(-1,2,-2); 
+        ball2Node.setLocalPosition(-1,10,-2); // original position 
+        //ball2Node.setLocalPosition(-1,2,-2); 
         
         // Ground plane       
         Entity groundEntity = sm.createEntity(GROUND_E, "cube.obj");
         groundNode = rootNode.createChildSceneNode(GROUND_N);
         groundNode.attachObject(groundEntity);
-        groundNode.setLocalPosition(0, -7, -2); // original position
-        //groundNode.setLocalPosition(0, 0, 0);       // set ground to xyz to 0
+        //groundNode.setLocalPosition(0, -7, -2); // original position
+        groundNode.setLocalPosition(0, 0, 0);       // set ground to xyz to 0
         initPhysicsSystem();
         createRagePhysicsWorld();
          
@@ -263,12 +290,26 @@ class MyGame extends VariableFrameRateGame {
 			player.setRotateRight(true);
 			orbitCamera.setRotateLeft(true);
 			break;
-		case KeyEvent.VK_W:
-			player.setMoveForward(true);
+		//case KeyEvent.VK_W:
+			/*if(running) {
+				System.out.println("Moving forward");
+				playerPhysObj.applyForce(0.0f, 0.0f, 10.0f, playerNode.getLocalPosition().x(), 
+						playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
+			}
+			else {*/
+			//player.setMoveForward(false);
+			//}
 			//this.doNWalk();
-			break;
+			//break;
 		case KeyEvent.VK_S:
-			player.setMoveBackward(true);
+			/*if(running) {
+				System.out.println("Moving backward");
+				playerPhysObj.applyForce(0.0f, 0.0f, -10.0f, playerNode.getLocalPosition().x(), 
+						playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
+			}
+			else {*/
+				player.setMoveBackward(true);
+			//}
 			break;
 		case KeyEvent.VK_F:
 			orbitCamera.setMoveForward(true);
@@ -314,11 +355,25 @@ class MyGame extends VariableFrameRateGame {
 			orbitCamera.setRotateLeft(false);
 			break;
 		case KeyEvent.VK_W:
+			/*if(running) {
+				System.out.println("Moving forward");
+				playerPhysObj.applyForce(0.0f, 0.0f, 10.0f, playerNode.getLocalPosition().x(), 
+						playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
+			}
+			else {*/
 			player.setMoveForward(false);
+			//}
 			this.doNWalk();
 			break;
 		case KeyEvent.VK_S:
-			player.setMoveBackward(false);
+			/*if(running) {
+				System.out.println("Moving backward");
+				playerPhysObj.applyForce(0.0f, 0.0f, -10.0f, playerNode.getLocalPosition().x(), 
+						playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
+			}
+			else {*/
+				player.setMoveBackward(true);
+			//}
 			break;
 		case KeyEvent.VK_F:
 			orbitCamera.setMoveForward(false);
@@ -378,16 +433,17 @@ class MyGame extends VariableFrameRateGame {
 		//Updating skeletalentity animations
 		SkeletalEntity playerEntity = (SkeletalEntity) engine.getSceneManager().getEntity("walker");
 		SkeletalEntity manEntity = (SkeletalEntity) game.getEngine().getSceneManager().getEntity("man4");
+		SkeletalEntity robotEntity = (SkeletalEntity) game.getEngine().getSceneManager().getEntity("robot");
 		playerEntity.update();
 		manEntity.update();
+		robotEntity.update();
 
         // physics
         if (running)    
         { 
             Matrix4 mat;
             physicsEngine.update(elapsTime);
-            for (SceneNode s : engine.getSceneManager().getSceneNodes())
-            { 
+            for (SceneNode s : engine.getSceneManager().getSceneNodes()) { 
                 if (s.getPhysicsObject() != null)
                 { 
                     mat = Matrix4f.createFrom(toFloatArray(s.getPhysicsObject().getTransform()));
@@ -456,19 +512,19 @@ class MyGame extends VariableFrameRateGame {
 		}
 	}
 	
-	public void addGhostNPCtoGameWorld(GhostNPC npc) {
+	public void addGhostNPCtoGameWorld(GhostNPC npc) throws IOException {
 		//Has a problem with id. Should it be an int or an UUID? Prof code has as an int. 
-		/*if (npc != null) { 
+		if (npc != null) { 
 			Entity ghostE = sm.createEntity("ghost", "dolphinHighPoly.obj");
 			ghostE.setPrimitive(Primitive.TRIANGLES);
 			SceneNode ghostN = sm.getRootSceneNode().
-			createChildSceneNode(npc.getID().toString());
+			createChildSceneNode(Integer.toString(npc.getID()));
 			ghostN.attachObject(ghostE);
 			ghostN.setLocalPosition(npc.getPosition());
 			npc.setNode(ghostN);
 			npc.setEntity(ghostE);
 			//avatar.setPosition(node’s position... maybe redundant);
-		}*/
+		}
 	}
 	
 	public void removeGhostAvatarFromGameWorld(GhostAvatar avatar) { 
@@ -487,6 +543,13 @@ class MyGame extends VariableFrameRateGame {
 		float mass = 1.0f;
 		float up[] = {0,1,0};
 		double[] temptf;
+		
+		/*System.out.println("Adding player Physics");
+		temptf = toDoubleArray(playerNode.getLocalTransform().toFloatArray());
+		playerPhysObj = physicsEngine.addBoxObject(physicsEngine.nextUID(), mass, temptf, up);
+		//playerPhysObj.setBounciness(1.0f);
+		playerPhysObj.setFriction(1.0f);
+		playerNode.setPhysicsObject(playerPhysObj);*/
          
 		temptf = toDoubleArray(ball1Node.getLocalTransform().toFloatArray());
 		ball1PhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
@@ -505,6 +568,7 @@ class MyGame extends VariableFrameRateGame {
        	groundNode.setLocalPosition(0, -7, -2);
        	groundNode.setPhysicsObject(groundPlaneP);
        	// can also set damping, friction, etc.
+       	
    }
    private float[] toFloatArray(double[] arr)
    { 

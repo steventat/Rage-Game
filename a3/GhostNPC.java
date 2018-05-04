@@ -23,9 +23,9 @@ public class GhostNPC {
         node.setLocalPosition(position);
      }
       
-     public void getPosition(Vector3 position)
+     public Vector3 getPosition()
      { 
-        node.setLocalPosition(position);
+        return position;
      }
      
      public int getID() {
