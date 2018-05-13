@@ -20,4 +20,8 @@ public class NPCcontroller
 	public NPC getNPC(int index) {
 		return NPClist[index];
 	}
+	
+	public void setUpNPC() {
+		NPClist[0] = new NPC(0.0, 0.0, 0.0);
+	}
 }

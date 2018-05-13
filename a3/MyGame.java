@@ -482,8 +482,8 @@ class MyGame extends VariableFrameRateGame {
 		// Process packets received by the client from the server
 		if (protClient != null)
 			protClient.processPackets();
-			// remove ghost avatars for players who have left the game
-			Iterator<UUID> it = gameObjectsToRemove.iterator();
+		// remove ghost avatars for players who have left the game
+		Iterator<UUID> it = gameObjectsToRemove.iterator();
 		while(it.hasNext()) { 
 			sm.destroySceneNode(it.next().toString());
 		}

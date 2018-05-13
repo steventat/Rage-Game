@@ -1,3 +1,7 @@
+/**
+ * The server will send the NPC locations.
+ */
+
 package a3;
 
 import java.io.IOException;
