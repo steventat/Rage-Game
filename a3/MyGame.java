@@ -48,13 +48,22 @@ import ray.physics.PhysicsEngineFactory;    // import physics
 import ray.audio.*;							// import audio
 import com.jogamp.openal.ALFactory;			// import audio
 
+import javax.script.ScriptEngine;			// import script
+import javax.script.ScriptEngineFactory;	// import script
+import javax.script.ScriptEngineManager;	// import script
+import javax.script.ScriptException;		// import script
+
+
 class MyGame extends VariableFrameRateGame {
 	
 	private static MyGame game;
 
-	public static String MAP_TEXTURE_SCRIPT = "scripts\\map_texture.js";
-	public static String MAP_FILE_SCRIPT = "scripts\\map_file.js";
+	public static String MAP_TEXTURE_SCRIPT = "scripts\\map_texture.js";	// script for map texture
+	public static String MAP_FILE_SCRIPT = "scripts\\map_file.js";			// script for map file
+	public static String CONFIG_SCRIPT = "scripts\\config.js";				// script for configuration
 
+	String configScript;						// script after reading
+	
 	private Player player;
 	private OrbitCameraController orbitCamera;
 	private Camera cam;
@@ -95,9 +104,12 @@ class MyGame extends VariableFrameRateGame {
     
     private SceneNode robotNode; // set to gloabl for sound
     
-    IAudioManager audioMgr;					// sound
-    Sound oceanSound, hereSound;			// sound     
+    private IAudioManager audioMgr;					// sound
+    private Sound oceanSound, hereSound;			// sound     
 	
+    private int maxscore;							// maxscore read from JavaScript file
+    
+    
 	//I'll leave this static because I wouldn't want two MyGames
 	public static MyGame getGame() {
 		return game;
@@ -165,14 +177,18 @@ class MyGame extends VariableFrameRateGame {
 	protected void setupScene(Engine eng, SceneManager sm) throws IOException {
 		setupNetworking();
 		im = new GenericInputManager();	//Initializing input manager for controllers
+
+		// Java Script
+		ScriptEngineManager factory = new ScriptEngineManager();
+		ScriptEngine jsEngine = factory.getEngineByName("js");		
 		
 		this.sm = sm;
-		ScriptEngineManager factory = new ScriptEngineManager();
-		ScriptEngine jsEngine = factory.getEngineByName("js");
 		
         // ambient light
 		//sm.getAmbientLight().setIntensity(new Color(0.5f, 0.5f, 0.5f));
 		sm.getAmbientLight().setIntensity(new Color(.1f, .1f, .1f));
+		
+		// Positional Light
         Light plight = sm.createLight("testLamp1", Light.Type.POINT);
         plight.setAmbient(new Color(.3f, .3f, .3f));
         plight.setDiffuse(new Color(.7f, .7f, .7f));
@@ -180,15 +196,35 @@ class MyGame extends VariableFrameRateGame {
         plight.setRange(5f);
         SceneNode plightNode = sm.getRootSceneNode().createChildSceneNode("plightNode");
         plightNode.attachObject(plight);
-        
 
+        // Spot Light
+        Light spotLight = sm.createLight("spotLight",  Light.Type.SPOT);
+        spotLight.setAmbient(new Color(.4f, .3f, .5f));
+        spotLight.setDiffuse(new Color(.7f, .3f, .5f));
+        spotLight.setSpecular(new Color(1.0f, 1.0f, 1.0f));
+        spotLight.setRange(3f);
+        SceneNode spotLightNode = sm.getRootSceneNode().createChildSceneNode("spotLightNode");
+        spotLightNode.attachObject(spotLight);
+        
 		SceneNode cameraNode = sm.getRootSceneNode().createChildSceneNode("CameraNode");
 		cameraNode.attachObject(cam);
 		
+//		LightManager lightMggr = new LightManager(this);
+//		lightMgr.putLightSpotFocusOnNode(sm.getSceneNode("hatoflifeNode"), "L1", new Color(75,72,25));
+//		LightMgr.putLightSpotFocusOnNode(sm.getSceneNode("hatofLifeNode"), "L2", new Color(255, 55, 35));
+		
 		//Initialize Player
 		player = new Player(sm);
+		
+		// Load map
 		map = new Map(eng, sm, readScript(jsEngine, MAP_FILE_SCRIPT), 
 				readScript(jsEngine, MAP_TEXTURE_SCRIPT));
+		
+		// Load configuration file
+		configScript = readScript(jsEngine, CONFIG_SCRIPT);		
+		maxscore = (int) jsEngine.get("maxscore");
+		System.out.println("MAXSCORE: " + maxscore);		// print to command line the maxscore
+		
 		
 		//Initialize Orbit Camera
 		orbitCamera = new OrbitCameraController(cameraNode, player.getNode(), cam);
@@ -442,7 +478,6 @@ class MyGame extends VariableFrameRateGame {
 		else { // ask client protocol to send initial join message
 				//to server, with a unique identifier for this client
 			protClient.sendJoinMessage();
-			protClient.askForNPCinfo();
 		} 
 	}
 	
