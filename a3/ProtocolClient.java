@@ -24,7 +24,7 @@ public class ProtocolClient extends GameConnectionClient {
 	ProtocolType pType, MyGame game) throws IOException { 
 		super(remAddr, remPort, pType);
 		this.game = game;
-		this.id = UUID.randomUUID();
+		this.id = UUID.randomUUID(); //Client ID
 		this.ghostAvatars = new Vector<GhostAvatar>();
 	}
 	
@@ -66,19 +66,25 @@ public class ProtocolClient extends GameConnectionClient {
 					System.out.println("error creating ghost avatar");
 				} 
 			}
-			if(messageTokens[0].compareTo("dsfr") == 0) { // receive "dsfr"
+			if(messageTokens[0].compareTo("dsfr") == 0) { // receive "dsfr"	//Should receive the UUID of the other players.
 				System.out.println("Obtained details for message");
-				UUID ghostID = UUID.fromString(messageTokens[1]);
-				Vector3 ghostPosition = Vector3f.createFrom(
-					Float.parseFloat(messageTokens[2]),
-					Float.parseFloat(messageTokens[3]),
-					Float.parseFloat(messageTokens[4]));
-				try {
-					System.out.println("Creating ghost avatar");
-					createGhostAvatar(ghostID, ghostPosition);
-				} catch (IOException e) {
-					System.out.println("error creating ghost avatar");
-					e.printStackTrace();
+				UUID ghostID = UUID.fromString(messageTokens[1]);	//Can be either 1 or 5. Only 1 works for now.
+				System.out.println(ghostID);
+				System.out.println(id);
+				System.out.println("Comparing UUIDs...: " + ghostID.compareTo(id));
+				if(ghostID.compareTo(id) != 0) {
+					System.out.println("IDs do not match");
+					Vector3 ghostPosition = Vector3f.createFrom(
+						Float.parseFloat(messageTokens[2]),
+						Float.parseFloat(messageTokens[3]),
+						Float.parseFloat(messageTokens[4]));
+					try {
+						System.out.println("Creating ghost avatar");
+						createGhostAvatar(ghostID, ghostPosition);
+					} catch (IOException e) {
+						System.out.println("error creating ghost avatar");
+						e.printStackTrace();
+					}
 				}
 			}
 			if(messageTokens[0].compareTo("wsds") == 0) { // receive "want"
@@ -145,6 +151,7 @@ public class ProtocolClient extends GameConnectionClient {
 		try { 	
 			String message = new String("dsfr," + remId.toString());
 			message += "," + pos.x()+"," + pos.y() + "," + pos.z();
+			message += "," + id.toString();
 			System.out.println("Sending Details For message\n");
 			sendPacket(message);
 		}

@@ -23,6 +23,9 @@ import net.java.games.input.Component.Identifier.Key;
 import java.awt.event.KeyEvent;
 import java.awt.geom.*;
 import javax.script.*;
+
+import myGameEngine.*;
+
 import java.net.InetAddress;
 
 import ray.networking.IGameConnection.ProtocolType;	// import networking
@@ -53,6 +56,23 @@ class MyGame extends VariableFrameRateGame {
 	private Map map;
 	private SceneManager sm;
 	
+	//Action Classes and Input Manager
+	private InputManager im;
+    //private Action quitGameAction;
+	private MoveForwardAction dMoveF;
+	private MoveBackwardAction dMoveB;
+	private MoveLeftAction dMoveL;
+	private MoveRightAction dMoveR;
+	private YawLeftAction dYawL;
+	private YawRightAction dYawR;
+	//private Camera3PController orbitController, orbitController2;
+	private MoveForwardAction eMoveF;
+	private MoveBackwardAction eMoveB;
+	private MoveLeftAction eMoveL;
+	private MoveRightAction eMoveR;
+	private YawLeftAction eYawL;
+	private YawRightAction eYawR;
+	
 	private String serverAddress;			// network
 	private int serverPort;					// network
 	private ProtocolType serverProtocol;	// network
@@ -70,6 +90,7 @@ class MyGame extends VariableFrameRateGame {
     
     private static SceneNode playerNode;
     private PhysicsObject playerPhysObj; 
+    
      
 	
 	//I'll leave this static because I wouldn't want two MyGames
@@ -132,18 +153,35 @@ class MyGame extends VariableFrameRateGame {
 	@Override
 	protected void setupScene(Engine eng, SceneManager sm) throws IOException {
 		setupNetworking();
+		im = new GenericInputManager();	//Initializing input manager for controllers
+		
 		this.sm = sm;
 		ScriptEngineManager factory = new ScriptEngineManager();
 		ScriptEngine jsEngine = factory.getEngineByName("js");
 		sm.getAmbientLight().setIntensity(new Color(0.5f, 0.5f, 0.5f));
 		SceneNode cameraNode = sm.getRootSceneNode().createChildSceneNode("CameraNode");
 		cameraNode.attachObject(cam);
+		
+		//Initialize Player
 		player = new Player(sm);
 		map = new Map(eng, sm, readScript(jsEngine, MAP_FILE_SCRIPT), 
 				readScript(jsEngine, MAP_TEXTURE_SCRIPT));
+		
+		//Initialize Orbit Camera
 		orbitCamera = new OrbitCameraController(cameraNode, player.getNode(), cam);
 		setupSkybox(eng, sm);
 		
+		//Initializing actions and connecting to nodes.
+		SceneNode playerN = sm.getSceneNode("playerNode");
+        dMoveF = new MoveForwardAction(playerN);
+        dMoveB = new MoveBackwardAction(playerN);
+        dMoveL = new MoveLeftAction(playerN);
+        dMoveR = new MoveRightAction(playerN);
+        dYawL = new YawLeftAction(playerN);
+        dYawR = new YawRightAction(playerN);
+		setupInputs(sm);
+		
+		//Creating the sea
 		/*ManualObject sea = ManualGraphics.makePlane("default.mtl", "default.png", Color.BLUE);
 		SceneNode seaNode = sm.getRootSceneNode().createChildSceneNode("SeaNode");
 		seaNode.attachObject(sea);
@@ -277,132 +315,28 @@ class MyGame extends VariableFrameRateGame {
 		System.out.println(result);
 		return result;
 	}
-
-	@Override
-	public void keyPressed(KeyEvent evt) {
-		int keyCode = evt.getKeyCode();
-		switch(keyCode) {
-		case KeyEvent.VK_A:
-			player.setRotateLeft(true);
-			orbitCamera.setRotateRight(true);
-			break;
-		case KeyEvent.VK_D:
-			player.setRotateRight(true);
-			orbitCamera.setRotateLeft(true);
-			break;
-		//case KeyEvent.VK_W:
-			/*if(running) {
-				System.out.println("Moving forward");
-				playerPhysObj.applyForce(0.0f, 0.0f, 10.0f, playerNode.getLocalPosition().x(), 
-						playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
-			}
-			else {*/
-			//player.setMoveForward(false);
-			//}
-			//this.doNWalk();
-			//break;
-		case KeyEvent.VK_S:
-			/*if(running) {
-				System.out.println("Moving backward");
-				playerPhysObj.applyForce(0.0f, 0.0f, -10.0f, playerNode.getLocalPosition().x(), 
-						playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
-			}
-			else {*/
-				player.setMoveBackward(true);
-			//}
-			break;
-		case KeyEvent.VK_F:
-			orbitCamera.setMoveForward(true);
-			break;
-		case KeyEvent.VK_B:
-			orbitCamera.setMoveBackward(true);
-			break;
-		case KeyEvent.VK_RIGHT:
-			orbitCamera.setRotateRight(true);
-			break;
-		case KeyEvent.VK_LEFT:
-			orbitCamera.setRotateLeft(true);
-			break;
-		case KeyEvent.VK_UP:
-			orbitCamera.setRotateUp(true);
-			break;
-		case KeyEvent.VK_DOWN:
-			orbitCamera.setRotateDown(true);
-			break;
-		case KeyEvent.VK_Q:
-			orbitCamera.moveFurther(0.5f);
-			break;
-		case KeyEvent.VK_E:
-			orbitCamera.moveCloser(0.5f);
-			break;
-		case KeyEvent.VK_P:                     // Press 'P' to enable Physics
-            System.out.println("Starting Physics!");
-            running = true;
-            break;
-		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent evt) {
-		int keyCode = evt.getKeyCode();
-		switch(keyCode) {
-		case KeyEvent.VK_A:
-			player.setRotateLeft(false);
-			orbitCamera.setRotateRight(false);
-			break;
-		case KeyEvent.VK_D:
-			player.setRotateRight(false);
-			orbitCamera.setRotateLeft(false);
-			break;
-		case KeyEvent.VK_W:
-			/*if(running) {
-				System.out.println("Moving forward");
-				playerPhysObj.applyForce(0.0f, 0.0f, 10.0f, playerNode.getLocalPosition().x(), 
-						playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
-			}
-			else {*/
-			player.setMoveForward(false);
-			//}
-			this.doNWalk();
-			break;
-		case KeyEvent.VK_S:
-			/*if(running) {
-				System.out.println("Moving backward");
-				playerPhysObj.applyForce(0.0f, 0.0f, -10.0f, playerNode.getLocalPosition().x(), 
-						playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
-			}
-			else {*/
-				player.setMoveBackward(true);
-			//}
-			break;
-		case KeyEvent.VK_F:
-			orbitCamera.setMoveForward(false);
-			break;
-		case KeyEvent.VK_B:
-			orbitCamera.setMoveBackward(false);
-			break;
-		case KeyEvent.VK_RIGHT:
-			orbitCamera.setRotateRight(false);
-			break;
-		case KeyEvent.VK_LEFT:
-			orbitCamera.setRotateLeft(false);
-			break;
-		case KeyEvent.VK_UP:
-			orbitCamera.setRotateUp(false);
-			break;
-		case KeyEvent.VK_DOWN:
-			orbitCamera.setRotateDown(false);
-			break;
-		case KeyEvent.VK_Q:
-			orbitCamera.moveFurther(0.5f);
-			break;
-		case KeyEvent.VK_E:
-			orbitCamera.moveCloser(0.5f);
-			break;
-		case KeyEvent.VK_SPACE:
-			this.doAttack();
-			break;
-		}
+	
+	//Setting up Gamepads and Controolers
+	protected void setupInputs(SceneManager sm) { 
+    	String kbName = im.getKeyboardName();
+	    //String gpName = im.getFirstGamepadName();
+	    //SceneNode playerNode = getEngine().getSceneManager().getSceneNode("playerNode");
+	    try {
+		    im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.W, dMoveF, 
+		    		InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+		    im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.S, dMoveB, 
+		    		InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+		    im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.A, dMoveL, 
+		    		InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+		    im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.D, dMoveR, 
+		    		InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+		    im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.LEFT, dYawL, 
+		    		InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+		    im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.RIGHT, dYawR, 
+		    		InputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN); 
+	    } catch (RuntimeException re) {
+	    	System.out.println("No controller plugged in");
+	    }
 	}
 	
 	private void doAttack() { 
@@ -427,6 +361,7 @@ class MyGame extends VariableFrameRateGame {
 		float elapsTime = engine.getElapsedTimeMillis();
 		float seconds = elapsTime / 1000f;
 		player.update(map, seconds);
+		im.update(elapsTime);	//Need to update input manager for controller inputs
 		orbitCamera.update(seconds);
 		processNetworking(elapsTime);
 		
@@ -482,8 +417,8 @@ class MyGame extends VariableFrameRateGame {
 		// Process packets received by the client from the server
 		if (protClient != null)
 			protClient.processPackets();
-			// remove ghost avatars for players who have left the game
-			Iterator<UUID> it = gameObjectsToRemove.iterator();
+		// remove ghost avatars for players who have left the game
+		Iterator<UUID> it = gameObjectsToRemove.iterator();
 		while(it.hasNext()) { 
 			sm.destroySceneNode(it.next().toString());
 		}
@@ -603,5 +538,133 @@ class MyGame extends VariableFrameRateGame {
 		if(protClient != null && isClientConnected == true) { 
 			protClient.sendByeMessage();
 		} 
+	}
+}*/
+
+
+/*@Override
+public void keyPressed(KeyEvent evt) {
+	int keyCode = evt.getKeyCode();
+	switch(keyCode) {
+	case KeyEvent.VK_A:
+		player.setRotateLeft(true);
+		orbitCamera.setRotateRight(true);
+		break;
+	case KeyEvent.VK_D:
+		player.setRotateRight(true);
+		orbitCamera.setRotateLeft(true);
+		break;*/
+	//case KeyEvent.VK_W:
+		/*if(running) {
+			System.out.println("Moving forward");
+			playerPhysObj.applyForce(0.0f, 0.0f, 10.0f, playerNode.getLocalPosition().x(), 
+					playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
+		}
+		else {*/
+		//player.setMoveForward(false);
+		//}
+		//this.doNWalk();
+		//break;
+	/*case KeyEvent.VK_S:
+		if(running) {
+			System.out.println("Moving backward");
+			playerPhysObj.applyForce(0.0f, 0.0f, -10.0f, playerNode.getLocalPosition().x(), 
+					playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
+		}
+		else {
+			player.setMoveBackward(true);
+		//}
+		break;
+	case KeyEvent.VK_F:
+		orbitCamera.setMoveForward(true);
+		break;
+	case KeyEvent.VK_B:
+		orbitCamera.setMoveBackward(true);
+		break;
+	case KeyEvent.VK_RIGHT:
+		orbitCamera.setRotateRight(true);
+		break;
+	case KeyEvent.VK_LEFT:
+		orbitCamera.setRotateLeft(true);
+		break;
+	case KeyEvent.VK_UP:
+		orbitCamera.setRotateUp(true);
+		break;
+	case KeyEvent.VK_DOWN:
+		orbitCamera.setRotateDown(true);
+		break;
+	case KeyEvent.VK_Q:
+		orbitCamera.moveFurther(0.5f);
+		break;
+	case KeyEvent.VK_E:
+		orbitCamera.moveCloser(0.5f);
+		break;
+	case KeyEvent.VK_P:                     // Press 'P' to enable Physics
+        System.out.println("Starting Physics!");
+        running = true;
+        break;
+	}
+}*/
+
+/*@Override
+public void keyReleased(KeyEvent evt) {
+	int keyCode = evt.getKeyCode();
+	switch(keyCode) {
+	case KeyEvent.VK_A:
+		player.setRotateLeft(false);
+		orbitCamera.setRotateRight(false);
+		break;
+	case KeyEvent.VK_D:
+		player.setRotateRight(false);
+		orbitCamera.setRotateLeft(false);
+		break;
+	case KeyEvent.VK_W:*/
+		/*if(running) {
+			System.out.println("Moving forward");
+			playerPhysObj.applyForce(0.0f, 0.0f, 10.0f, playerNode.getLocalPosition().x(), 
+					playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
+		}
+		else {
+		/*player.setMoveForward(false);
+		//}
+		this.doNWalk();
+		break;
+	case KeyEvent.VK_S:
+		if(running) {
+			System.out.println("Moving backward");
+			playerPhysObj.applyForce(0.0f, 0.0f, -10.0f, playerNode.getLocalPosition().x(), 
+					playerNode.getLocalPosition().y(), playerNode.getLocalPosition().z());
+		}
+		else {
+			player.setMoveBackward(true);
+		//}
+		break;
+	case KeyEvent.VK_F:
+		orbitCamera.setMoveForward(false);
+		break;
+	case KeyEvent.VK_B:
+		orbitCamera.setMoveBackward(false);
+		break;
+	case KeyEvent.VK_RIGHT:
+		orbitCamera.setRotateRight(false);
+		break;
+	case KeyEvent.VK_LEFT:
+		orbitCamera.setRotateLeft(false);
+		break;
+	case KeyEvent.VK_UP:
+		orbitCamera.setRotateUp(false);
+		break;
+	case KeyEvent.VK_DOWN:
+		orbitCamera.setRotateDown(false);
+		break;
+	case KeyEvent.VK_Q:
+		orbitCamera.moveFurther(0.5f);
+		break;
+	case KeyEvent.VK_E:
+		orbitCamera.moveCloser(0.5f);
+		break;
+	case KeyEvent.VK_SPACE:
+		this.doAttack();
+		break;
 	}
 }*/

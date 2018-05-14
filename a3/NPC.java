@@ -4,9 +4,12 @@ import ray.rml.Vector3;
 
 public class NPC {
 	double locX, locY, locZ; // other state info goes here (FSM)
+	//Probably better as floats
 	
-	public NPC() {
-		
+	public NPC(double x, double y, double z) {
+		locX = x;
+		locY = y;
+		locZ = z;
 	}
 	
 	public double getX() { 
