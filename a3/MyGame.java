@@ -82,16 +82,18 @@ class MyGame extends VariableFrameRateGame {
 	private boolean isClientConnected;		// network
 	private Vector<UUID> gameObjectsToRemove;	// network
 
-    private SceneNode ball1Node, ball2Node, groundNode; // physics
+    private SceneNode earthNode, coneNode, groundNode; // physics
     private SceneNode cameraPositionNode;               //  physics
     private final static String GROUND_E = "Ground";    //  physics
     private final static String GROUND_N = "GroundNode";//  physics
     private PhysicsEngine physicsEngine;                    //  physics
-    private PhysicsObject ball1PhysObj, ball2PhysObj, groundPlaneP; // physics
+    private PhysicsObject earthPhysObj,conePhysObj, groundPlaneP; // physics
     private boolean running = false;                    //  physics
     
     private static SceneNode playerNode;
     private PhysicsObject playerPhysObj; 
+    
+    private SceneNode robotNode; // set to gloabl for sound
     
     IAudioManager audioMgr;					// sound
     Sound oceanSound, hereSound;			// sound     
@@ -217,7 +219,7 @@ class MyGame extends VariableFrameRateGame {
 		man4Entity.playAnimation("man4_walk", 0.5f, LOOP, 0);
 		
 		SkeletalEntity robotEntity = sm.createSkeletalEntity("robot", "robot.rkm", "robot.rks");
-		SceneNode robotNode = sm.getRootSceneNode().createChildSceneNode("robotNode");
+		robotNode = sm.getRootSceneNode().createChildSceneNode("robotNode");  
 		robotNode.moveUp(0.5f);
 		robotNode.moveRight(3.0f);
 		robotNode.scale(0.1f, 0.1f, 0.1f);
@@ -241,18 +243,18 @@ class MyGame extends VariableFrameRateGame {
         SceneNode rootNode = sm.getRootSceneNode();         
         
         // Ball 1
-        Entity ball1Entity = sm.createEntity("ball1", "earth.obj");
-        ball1Node = rootNode.createChildSceneNode("Ball1Node");
-        ball1Node.attachObject(ball1Entity);
-        ball1Node.setLocalPosition(0, 2, -2);  // original position
-        //ball1Node.setLocalPosition(0, 3, -2);
+        Entity earthEntity = sm.createEntity("earth", "earth.obj");
+        earthNode = rootNode.createChildSceneNode("earthNode");
+        earthNode.attachObject(earthEntity);
+        earthNode.setLocalPosition(0, 2, -2);  // original position
+        //earthNode.setLocalPosition(0, 3, -2);
         
         // Ball 2
-        Entity ball2Entity = sm.createEntity("Ball2", "cone.obj"); // cone.obj as 2nd ball
-        ball2Node = rootNode.createChildSceneNode("Ball2Node");
-        ball2Node.attachObject(ball2Entity);
-        ball2Node.setLocalPosition(-1,10,-2); // original position 
-        //ball2Node.setLocalPosition(-1,2,-2); 
+        Entity ball2Entity = sm.createEntity("cone", "cone.obj"); // cone.obj as 2nd ball
+        coneNode = rootNode.createChildSceneNode("coneNode");
+        coneNode.attachObject(ball2Entity);
+        coneNode.setLocalPosition(-1,10,-2); // original position 
+        //coneNode.setLocalPosition(-1,2,-2); 
         
         // Ground plane       
         Entity groundEntity = sm.createEntity(GROUND_E, "cube.obj");
@@ -496,15 +498,15 @@ class MyGame extends VariableFrameRateGame {
 		playerPhysObj.setFriction(1.0f);
 		playerNode.setPhysicsObject(playerPhysObj);*/
          
-		temptf = toDoubleArray(ball1Node.getLocalTransform().toFloatArray());
-		ball1PhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
-       	ball1PhysObj.setBounciness(1.0f);
-       	ball1Node.setPhysicsObject(ball1PhysObj);
+		temptf = toDoubleArray(earthNode.getLocalTransform().toFloatArray());
+		earthPhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
+       	earthPhysObj.setBounciness(1.0f);
+       	earthNode.setPhysicsObject(earthPhysObj);
         
-       	temptf = toDoubleArray(ball2Node.getLocalTransform().toFloatArray());
-       	ball2PhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
-       	ball2PhysObj.setBounciness(1.0f);
-       	ball2Node.setPhysicsObject(ball2PhysObj);
+       	temptf = toDoubleArray(coneNode.getLocalTransform().toFloatArray());
+       	conePhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
+       	conePhysObj.setBounciness(1.0f);
+       	coneNode.setPhysicsObject(conePhysObj);
         
        	temptf = toDoubleArray(groundNode.getLocalTransform().toFloatArray());
        	groundPlaneP = physicsEngine.addStaticPlaneObject(physicsEngine.nextUID(),temptf, up, 0.0f);
@@ -541,11 +543,10 @@ class MyGame extends VariableFrameRateGame {
    
    public void setEarParameters(SceneManager sm)
    { 
- 		SceneNode dolphinNode = sm.getSceneNode("dolphinNode");
- 		Vector3 avDir = dolphinNode.getWorldForwardAxis();
+ 		Vector3 avDir = playerNode.getWorldForwardAxis();
  		//  note - should get the camera's forward direction
  		//     - avatar direction plus azimuth 
- 		audioMgr.getEar().setLocation(dolphinNode.getWorldPosition());
+ 		audioMgr.getEar().setLocation(playerNode.getWorldPosition());
  		audioMgr.getEar().setOrientation(avDir, Vector3f.createFrom(0,1,0));
    } 
 
@@ -557,8 +558,8 @@ class MyGame extends VariableFrameRateGame {
 		   System.out.println("Audio Manager failed to initialize!");
 		   return;
      } 
-     resource1 = audioMgr.createAudioResource("here.wav",AudioResourceType.AUDIO_SAMPLE);
-     resource2 = audioMgr.createAudioResource("Ocean_Waves-Mike_Koenig-980635527.wav",AudioResourceType.AUDIO_SAMPLE);
+     resource1 = audioMgr.createAudioResource("Cartoon Hop-SoundBible.com-553158131.wav",AudioResourceType.AUDIO_SAMPLE);
+     resource2 = audioMgr.createAudioResource("Water Splash-SoundBible.com-800223477.wav",AudioResourceType.AUDIO_SAMPLE);
      hereSound = new Sound(resource1,SoundType.SOUND_EFFECT, 100, true);
      oceanSound = new Sound(resource2,SoundType.SOUND_EFFECT, 100, true);
      hereSound.initialize(audioMgr);
@@ -571,8 +572,8 @@ class MyGame extends VariableFrameRateGame {
      oceanSound.setRollOff(5.0f);
 //     SceneNode robotN = sm.getSceneNode("robotNode");
 //     SceneNode earthN = sm.getSceneNode("earthNode");
-     hereSound.setLocation(robotN.getWorldPosition());
-     oceanSound.setLocation(earthN.getWorldPosition());
+     hereSound.setLocation(robotNode.getWorldPosition());
+     oceanSound.setLocation(earthNode.getWorldPosition());
      setEarParameters(sm);
      hereSound.play();
      oceanSound.play();
