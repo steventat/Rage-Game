@@ -92,7 +92,18 @@ public class ProtocolClient extends GameConnectionClient {
 				this.sendDetailsForMessage(UUID.fromString(messageTokens[1]), game.getPlayerPosition());
 			}
 			if(messageTokens[0].compareTo("move") == 0) { // receive "move" 
-				// etc….. 
+				System.out.println("Received move message");
+				UUID ghostID = UUID.fromString(messageTokens[1]);
+				try {
+					GhostAvatar avatar = game.getGhostAvatarByID(ghostID);
+					Vector3 ghostPosition = Vector3f.createFrom(
+							Float.parseFloat(messageTokens[2]),
+							Float.parseFloat(messageTokens[3]),
+							Float.parseFloat(messageTokens[4]));
+					avatar.setLocalPosition(ghostPosition);
+				} catch (Exception e) {
+					System.out.println("Could not find Ghost to move");
+				}
 			}
 		} 
 	}
@@ -160,7 +171,15 @@ public class ProtocolClient extends GameConnectionClient {
 		}
 	}
 	public void sendMoveMessage(Vector3 pos) { 
-	// etc….. 
+		try { 	
+			String message = new String("move," + id.toString());
+			message += "," + pos.x()+"," + pos.y() + "," + pos.z();
+			System.out.println("Sending move message\n");
+			sendPacket(message);
+		}
+		catch (IOException e) { 
+			e.printStackTrace();
+		}
 	}
 	
 	public UUID getID() {

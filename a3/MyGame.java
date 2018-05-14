@@ -65,13 +65,9 @@ class MyGame extends VariableFrameRateGame {
 	private MoveRightAction dMoveR;
 	private YawLeftAction dYawL;
 	private YawRightAction dYawR;
+	
+	//May not need this because we have OrbitCameraController. 
 	//private Camera3PController orbitController, orbitController2;
-	private MoveForwardAction eMoveF;
-	private MoveBackwardAction eMoveB;
-	private MoveLeftAction eMoveL;
-	private MoveRightAction eMoveR;
-	private YawLeftAction eYawL;
-	private YawRightAction eYawR;
 	
 	private String serverAddress;			// network
 	private int serverPort;					// network
@@ -79,6 +75,7 @@ class MyGame extends VariableFrameRateGame {
 	private ProtocolClient protClient;		// network
 	private boolean isClientConnected;		// network
 	private Vector<UUID> gameObjectsToRemove;	// network
+	private Vector<GhostAvatar> ghostAvatarList;
 
     private SceneNode ball1Node, ball2Node, groundNode; // physics
     private SceneNode cameraPositionNode;               //  physics
@@ -172,13 +169,13 @@ class MyGame extends VariableFrameRateGame {
 		setupSkybox(eng, sm);
 		
 		//Initializing actions and connecting to nodes.
-		SceneNode playerN = sm.getSceneNode("playerNode");
-        dMoveF = new MoveForwardAction(playerN);
-        dMoveB = new MoveBackwardAction(playerN);
-        dMoveL = new MoveLeftAction(playerN);
-        dMoveR = new MoveRightAction(playerN);
-        dYawL = new YawLeftAction(playerN);
-        dYawR = new YawRightAction(playerN);
+		//SceneNode playerN = sm.getSceneNode("playerNode");
+        dMoveF = new MoveForwardAction(playerNode, protClient);
+        dMoveB = new MoveBackwardAction(playerNode, protClient);
+        dMoveL = new MoveLeftAction(playerNode, protClient);
+        dMoveR = new MoveRightAction(playerNode, protClient);
+        dYawL = new YawLeftAction(playerNode, protClient);
+        dYawR = new YawRightAction(playerNode, protClient);
 		setupInputs(sm);
 		
 		//Creating the sea
@@ -396,6 +393,7 @@ class MyGame extends VariableFrameRateGame {
 	
 	private void setupNetworking() { 
 		gameObjectsToRemove = new Vector<UUID>();
+		ghostAvatarList = new Vector<GhostAvatar>();
 		isClientConnected = false;
 		System.out.println("Setting up networking...\n");
 		try { 
@@ -443,6 +441,7 @@ class MyGame extends VariableFrameRateGame {
 			ghostN.setLocalPosition(avatar.getPosition());
 			avatar.setNode(ghostN);
 			avatar.setEntity(ghostE);
+			ghostAvatarList.add(avatar);
 			//avatar.setPosition(node’s position... maybe redundant);
 		}
 	}
@@ -464,6 +463,15 @@ class MyGame extends VariableFrameRateGame {
 	
 	public void removeGhostAvatarFromGameWorld(GhostAvatar avatar) { 
 		if(avatar != null) gameObjectsToRemove.add(avatar.getID());
+	}
+	
+	public GhostAvatar getGhostAvatarByID(UUID ghostID) throws Exception {
+		for(GhostAvatar ghost: this.ghostAvatarList) {
+			if(ghost.getID().compareTo(ghostID) == 0) {
+				return ghost;
+			}
+		}
+		throw new Exception("Could not find the Ghost by ID"); //Should create own classes for exception later.	
 	}
 	
 	private void initPhysicsSystem() { 
