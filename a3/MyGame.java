@@ -42,6 +42,8 @@ import ray.physics.PhysicsEngine;           // import physics
 import ray.physics.PhysicsObject;           // import physics
 import ray.physics.PhysicsEngineFactory;    // import physics
  
+import ray.audio.*;							// import audio
+import com.jogamp.openal.ALFactory;			// import audio
 
 class MyGame extends VariableFrameRateGame {
 	
@@ -91,7 +93,8 @@ class MyGame extends VariableFrameRateGame {
     private static SceneNode playerNode;
     private PhysicsObject playerPhysObj; 
     
-     
+    IAudioManager audioMgr;					// sound
+    Sound oceanSound, hereSound;			// sound     
 	
 	//I'll leave this static because I wouldn't want two MyGames
 	public static MyGame getGame() {
@@ -261,6 +264,8 @@ class MyGame extends VariableFrameRateGame {
         createRagePhysicsWorld();
          
         System.out.println("Press P to start the physics engine!");
+        
+        initAudio(sm);	// SOUND
 	}
 
 	private void setupSkybox(Engine eng, SceneManager sm) throws IOException {
@@ -386,6 +391,11 @@ class MyGame extends VariableFrameRateGame {
                 } 
             } 
         } 
+        
+        // sound
+		hereSound.setLocation(robotNode.getWorldPosition());	
+		oceanSound.setLocation(earthNode.getWorldPosition());	
+		setEarParameters(sm);
 		
 	}
 	
@@ -528,6 +538,46 @@ class MyGame extends VariableFrameRateGame {
 	   }
 	   return ret;
    }
+   
+   public void setEarParameters(SceneManager sm)
+   { 
+ 		SceneNode dolphinNode = sm.getSceneNode("dolphinNode");
+ 		Vector3 avDir = dolphinNode.getWorldForwardAxis();
+ 		//  note - should get the camera's forward direction
+ 		//     - avatar direction plus azimuth 
+ 		audioMgr.getEar().setLocation(dolphinNode.getWorldPosition());
+ 		audioMgr.getEar().setOrientation(avDir, Vector3f.createFrom(0,1,0));
+   } 
+
+   
+   public void initAudio(SceneManager sm)   { 
+	 AudioResource resource1, resource2;
+	 audioMgr = AudioManagerFactory.createAudioManager("ray.audio.joal.JOALAudioManager");
+     if (!audioMgr.initialize())     { 
+		   System.out.println("Audio Manager failed to initialize!");
+		   return;
+     } 
+     resource1 = audioMgr.createAudioResource("here.wav",AudioResourceType.AUDIO_SAMPLE);
+     resource2 = audioMgr.createAudioResource("Ocean_Waves-Mike_Koenig-980635527.wav",AudioResourceType.AUDIO_SAMPLE);
+     hereSound = new Sound(resource1,SoundType.SOUND_EFFECT, 100, true);
+     oceanSound = new Sound(resource2,SoundType.SOUND_EFFECT, 100, true);
+     hereSound.initialize(audioMgr);
+     oceanSound.initialize(audioMgr);
+     hereSound.setMaxDistance(10.0f);
+     hereSound.setMinDistance(0.5f);
+     hereSound.setRollOff(5.0f);
+     oceanSound.setMaxDistance(10.0f);
+     oceanSound.setMinDistance(0.5f);
+     oceanSound.setRollOff(5.0f);
+//     SceneNode robotN = sm.getSceneNode("robotNode");
+//     SceneNode earthN = sm.getSceneNode("earthNode");
+     hereSound.setLocation(robotN.getWorldPosition());
+     oceanSound.setLocation(earthN.getWorldPosition());
+     setEarParameters(sm);
+     hereSound.play();
+     oceanSound.play();
+   } 
+
 }
 
 
