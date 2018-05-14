@@ -24,12 +24,15 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.*;
 import javax.script.*;
 
+import java.util.Scanner;		// get user input from command line
+
 import myGameEngine.*;
 
 import java.net.InetAddress;
 
 import ray.networking.IGameConnection.ProtocolType;	// import networking
 import java.util.Iterator;
+
 import java.util.UUID;								// import networking
 import java.io.IOException;							// import networking
 import java.net.InetAddress;						// import networking
@@ -110,7 +113,13 @@ class MyGame extends VariableFrameRateGame {
 
 	public static void main(String[] args) {
 		//game = new MyGame(args[0], Integer.parseInt(args[1]));	//Needs to have assets and a3 in the same directory.
-		game = new MyGame("130.86.65.78", 8000);
+
+		System.out.print("Enter Networking Server IP Address: "); 
+/*		Scanner in 	= new Scanner (System.in);			// input IP address
+		game = new MyGame(in.next(), 8000);		
+*/		game = new MyGame("130.86.65.78", 8000);  // hardcored IP
+
+		
 		//Client client;
 		try {
 			game.startup();
@@ -160,7 +169,19 @@ class MyGame extends VariableFrameRateGame {
 		this.sm = sm;
 		ScriptEngineManager factory = new ScriptEngineManager();
 		ScriptEngine jsEngine = factory.getEngineByName("js");
-		sm.getAmbientLight().setIntensity(new Color(0.5f, 0.5f, 0.5f));
+		
+        // ambient light
+		//sm.getAmbientLight().setIntensity(new Color(0.5f, 0.5f, 0.5f));
+		sm.getAmbientLight().setIntensity(new Color(.1f, .1f, .1f));
+        Light plight = sm.createLight("testLamp1", Light.Type.POINT);
+        plight.setAmbient(new Color(.3f, .3f, .3f));
+        plight.setDiffuse(new Color(.7f, .7f, .7f));
+        plight.setSpecular(new Color(1.0f, 1.0f, 1.0f));
+        plight.setRange(5f);
+        SceneNode plightNode = sm.getRootSceneNode().createChildSceneNode("plightNode");
+        plightNode.attachObject(plight);
+        
+
 		SceneNode cameraNode = sm.getRootSceneNode().createChildSceneNode("CameraNode");
 		cameraNode.attachObject(cam);
 		
@@ -175,6 +196,7 @@ class MyGame extends VariableFrameRateGame {
 		
 		//Initializing actions and connecting to nodes.
 		//SceneNode playerN = sm.getSceneNode("playerNode");
+		
         dMoveF = new MoveForwardAction(playerNode, protClient);
         dMoveB = new MoveBackwardAction(playerNode, protClient);
         dMoveL = new MoveLeftAction(playerNode, protClient);
