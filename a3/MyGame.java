@@ -24,12 +24,15 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.*;
 import javax.script.*;
 
+import java.util.Scanner;		// get user input from command line
+
 import myGameEngine.*;
 
 import java.net.InetAddress;
 
 import ray.networking.IGameConnection.ProtocolType;	// import networking
 import java.util.Iterator;
+
 import java.util.UUID;								// import networking
 import java.io.IOException;							// import networking
 import java.net.InetAddress;						// import networking
@@ -110,7 +113,12 @@ class MyGame extends VariableFrameRateGame {
 
 	public static void main(String[] args) {
 		//game = new MyGame(args[0], Integer.parseInt(args[1]));	//Needs to have assets and a3 in the same directory.
-		game = new MyGame("130.86.65.78", 8000);
+		System.out.print("Enter Networking Server IP Address: ");
+		Scanner in 	= new Scanner (System.in);	
+		
+		//game = new MyGame("130.86.65.78", 8000);  // hardcored IP
+		game = new MyGame(in.next(), 8000);
+		
 		//Client client;
 		try {
 			game.startup();
@@ -175,6 +183,7 @@ class MyGame extends VariableFrameRateGame {
 		
 		//Initializing actions and connecting to nodes.
 		//SceneNode playerN = sm.getSceneNode("playerNode");
+		
         dMoveF = new MoveForwardAction(playerNode, protClient);
         dMoveB = new MoveBackwardAction(playerNode, protClient);
         dMoveL = new MoveLeftAction(playerNode, protClient);
