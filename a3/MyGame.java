@@ -420,6 +420,7 @@ class MyGame extends VariableFrameRateGame {
 		else { // ask client protocol to send initial join message
 				//to server, with a unique identifier for this client
 			protClient.sendJoinMessage();
+			protClient.askForNPCinfo();
 		} 
 	}
 	

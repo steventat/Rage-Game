@@ -1,0 +1,16 @@
+/ControlledEntity.class
+/GameAIServerUDP.class
+/GameServerUDP.class
+/GhostAvatar.class
+/GhostNPC.class
+/ManualGraphics.class
+/Map.class
+/Moveable.class
+/MyGame.class
+/NPC.class
+/NPCcontroller.class
+/NetworkingServer.class
+/OrbitCameraController.class
+/Player.class
+/ProtocolClient.class
+/TestGameClient.class

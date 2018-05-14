@@ -10,6 +10,8 @@ import java.util.UUID;
 import ray.networking.server.GameConnectionServer;
 import ray.networking.server.IClientInfo;
 public class GameServerUDP extends GameConnectionServer < UUID > {
+	
+	NPCcontroller npcCtrl = new NPCcontroller();
   
 	public GameServerUDP(int localPort) throws IOException {
 		super(localPort, ProtocolType.UDP);
@@ -110,6 +112,14 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 				};
 				this.sendMoveMessages(clientID, position);
 			}
+			if(msgTokens[0].compareTo("needNPC") == 0) {
+				System.out.println("Received needNPC message");
+				sendNPCinfo();
+		    }
+		    if(msgTokens[0].compareTo("collide") == 0)
+		    { 
+		    	//. . . 
+		    }
 		}
 	}
 	public void sendJoinedMessage(UUID clientID, boolean success) { // format: join, success or join, failure
@@ -176,5 +186,22 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 	public void sendByeMessages(UUID clientID) { 
 	// etc….. 
 
+	}
+	
+	public void sendNPCinfo() { // informs clients of new NPC positions 
+		for (int i=0; i<npcCtrl.getNumOfNPCs(); i++) { 
+	        try { 
+	        	String message = new String("mnpc," + Integer.toString(i));
+	        	message += "," + (npcCtrl.getNPC(i)).getX();
+	        	message += "," + (npcCtrl.getNPC(i)).getY();
+	        	message += "," + (npcCtrl.getNPC(i)).getZ();
+	        	System.out.println("Sending NPC info to clients...");
+	        	sendPacketToAll(message);
+	        	//. . .
+	        	// also additional cases for receiving messages about NPCs, such as:
+	        } catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
 	}
 }

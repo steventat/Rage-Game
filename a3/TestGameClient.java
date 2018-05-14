@@ -24,26 +24,24 @@ public class TestGameClient extends GameConnectionClient { // same as before, pl
 		this.ghostNPCs = new Vector<GhostNPC>();
 	}
     
-     private void createGhostNPC(int id, Vector3 position) throws IOException
-     { 
+    private void createGhostNPC(int id, Vector3 position) throws IOException { 
          GhostNPC newNPC = new GhostNPC(id, position);
          ghostNPCs.add(newNPC);
          game.addGhostNPCtoGameWorld(newNPC);
-     }
+    }
       
-     private void updateGhostNPC(int id, Vector3 position)
-     { 
-        ghostNPCs.get(id).setPosition(position);
-     }
+    private void updateGhostNPC(int id, Vector3 position) { 
+    	ghostNPCs.get(id).setPosition(position);
+    }
      
       
-     public void askForNPCinfo() { 
-    	 try { 
-    		 sendPacket(new String("needNPC," + id.toString()));
-    	 } catch (IOException e) { 
-    		 e.printStackTrace();
-    	 }
-     }
+    public void askForNPCinfo() { 
+    	try { 
+    		sendPacket(new String("needNPC," + id.toString()));
+    	} catch (IOException e) { 
+    		e.printStackTrace();
+    	}
+    }
      
      public void processPacket(Object message) {
     	 

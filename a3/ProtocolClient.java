@@ -19,6 +19,8 @@ public class ProtocolClient extends GameConnectionClient {
 	private UUID id;
 	private Vector<GhostAvatar> ghostAvatars;
 	private int numGhosts;
+	private Vector<GhostNPC> ghostNPCs;
+	private int numNPCs;
 	
 	public ProtocolClient(InetAddress remAddr, int remPort,
 	ProtocolType pType, MyGame game) throws IOException { 
@@ -26,6 +28,7 @@ public class ProtocolClient extends GameConnectionClient {
 		this.game = game;
 		this.id = UUID.randomUUID(); //Client ID
 		this.ghostAvatars = new Vector<GhostAvatar>();
+		this.ghostNPCs = new Vector<GhostNPC>();
 	}
 	
 	@Override
@@ -129,6 +132,28 @@ public class ProtocolClient extends GameConnectionClient {
 	public int getNumGhosts() {
 		return numGhosts;
 	}
+	
+	private void createGhostNPC(int id, Vector3 position) throws IOException
+    { 
+        GhostNPC newNPC = new GhostNPC(id, position);
+        ghostNPCs.add(newNPC);
+        game.addGhostNPCtoGameWorld(newNPC);
+    }
+     
+    private void updateGhostNPC(int id, Vector3 position)
+    { 
+    	ghostNPCs.get(id).setPosition(position);
+    }
+    
+     
+    public void askForNPCinfo() { 
+    	try {
+    		System.out.println("Asking for NPC info...");
+    		sendPacket(new String("needNPC," + id.toString()));
+   	 	} catch (IOException e) { 
+   	 		e.printStackTrace();
+   	 	}
+    }
 
 	/*Also need functions to instantiate ghost avatar, remove a ghost avatar,
 	look up a ghost in the ghost table, update a ghost's position, and
