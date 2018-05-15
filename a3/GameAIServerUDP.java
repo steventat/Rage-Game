@@ -2,7 +2,7 @@
  * The server will send the NPC locations.
  */
 
-package a3;
+/*package a3;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -62,6 +62,6 @@ public class GameAIServerUDP extends GameConnectionServer<UUID> {
  		} catch (IOException e) {
  			e.printStackTrace();
  		}
- 	}*/
-}
+ 	}
+}*/
            

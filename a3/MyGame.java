@@ -159,6 +159,8 @@ class MyGame extends VariableFrameRateGame {
 	@Override
 	protected void setupWindow(RenderSystem rs, GraphicsEnvironment ge) {
 		rs.createRenderWindow(new DisplayMode(1000, 700, 24, 60), false);
+		//rs.createRenderWindow(new DisplayMode(1000, 700, 24, 60), true);
+		//rs.createRenderWindow(true);
 	}
 
 	@Override
