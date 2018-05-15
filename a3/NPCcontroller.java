@@ -2,7 +2,7 @@ package a3;
 
 public class NPCcontroller
 {
-	private NPC[] NPClist = new NPC[5];
+	private NPC[] NPClist = new NPC[1];
      //. . .
      
 	public void updateNPCs() {
@@ -21,7 +21,9 @@ public class NPCcontroller
 		return NPClist[index];
 	}
 	
-	public void setUpNPC() {
+	public void setUpNPCs() {
 		NPClist[0] = new NPC(0.0, 0.0, 0.0);
+		System.out.println("NPCs: " + NPClist);
 	}
+	
 }

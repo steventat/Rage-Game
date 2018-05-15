@@ -71,6 +71,7 @@ public class ProtocolClient extends GameConnectionClient {
 			}
 			if(messageTokens[0].compareTo("dsfr") == 0) { // receive "dsfr"	//Should receive the UUID of the other players.
 				System.out.println("Obtained details for message");
+				System.out.println(messageTokens);
 				UUID ghostID = UUID.fromString(messageTokens[1]);	//Can be either 1 or 5. Only 1 works for now.
 				System.out.println(ghostID);
 				System.out.println(id);

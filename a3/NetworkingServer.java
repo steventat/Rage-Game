@@ -7,9 +7,12 @@ public class NetworkingServer {
 	private GameServerUDP thisUDPServer;
 //	private GameServerTCP thisTCPServer;
 	
-	/*private NPCcontroller npcCtrl;
+	private NPCcontroller npcCtrl;
 	//GameAIServerTCP tcpServer;
-	GameAIServerUDP udpServer;*/
+	//GameServerUDP udpServer;
+	
+	private long startTime;
+	private long lastUpdateTime;
 	
 	public NetworkingServer(int serverPort, String protocol) { 
 		try { 
@@ -18,6 +21,15 @@ public class NetworkingServer {
 //			}
 //			else { 
 				thisUDPServer = new GameServerUDP(serverPort);
+				
+				startTime = System.nanoTime();
+				lastUpdateTime = startTime;
+				//npcCtrl = new NPCcontroller();
+				npcCtrl = thisUDPServer.getController();
+			 // start networking TCP server (as before)
+			 // start NPC control loop
+				npcCtrl.setUpNPCs();
+				npcLoop();
 //			}
 		}
 		catch (IOException e) { 
@@ -25,27 +37,29 @@ public class NetworkingServer {
 		} 
 	}
 
-	 /*public TestNetworkingServer(int id) // constructor
-	 { startTime = System.nanoTime();
-	 lastUpdateTime = startTime;
-	 npcCtrl = new NPCcontroller();
-	 . . .
+	 /*public NetworkingServer(int id) { // constructor
+		 startTime = System.nanoTime();
+		 lastUpdateTime = startTime;
+		 npcCtrl = new NPCcontroller();
 	 // start networking TCP server (as before)
-	 . . .
 	 // start NPC control loop
-	 npcCtrl.setupNPCs();
-	 npcLoop();
+		 npcCtrl.setUpNPCs();
+		 npcLoop();
+	 }*/
+	 
+	 public void npcLoop() { // NPC control loop
+		 while (true) {
+			  long frameStartTime = System.nanoTime();
+			  float elapMilSecs = (frameStartTime-lastUpdateTime)/(1000000.0f);
+			  if (elapMilSecs >= 50.0f)
+			  { 
+				  lastUpdateTime = frameStartTime;
+				  npcCtrl.updateNPCs();
+				  thisUDPServer.sendNPCinfo();
+			  }
+			  Thread.yield();
+		 }
 	 }
-	 public void npcLoop() // NPC control loop
-	 { while (true)
-	 { long frameStartTime = System.nanoTime();
-	 float elapMilSecs = (frameStartTime-lastUpdateTime)/(1000000.0f);
-	 if (elapMilSecs >= 50.0f)
-	 { lastUpdateTime = frameStartTime;
-	 npcCtrl.updateNPCs();
-	 tcpServer.sendNPCinfo();
-	 }
-	 Thread.yield();*/
 	
 	public static void main(String[] args) { 
 		//if(args.length > 1) { 
