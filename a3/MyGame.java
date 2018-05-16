@@ -89,7 +89,8 @@ class MyGame extends VariableFrameRateGame {
 	private ProtocolClient protClient;		// network
 	private boolean isClientConnected;		// network
 	private Vector<UUID> gameObjectsToRemove;	// network
-	private Vector<GhostAvatar> ghostAvatarList;
+	private Vector<GhostAvatar> ghostAvatarList; //network
+	private Vector<GhostNPC> ghostNPCList; //AI
 
     private SceneNode earthNode, coneNode, groundNode; // physics
     private SceneNode cameraPositionNode;               //  physics
@@ -466,6 +467,7 @@ class MyGame extends VariableFrameRateGame {
 	private void setupNetworking() { 
 		gameObjectsToRemove = new Vector<UUID>();
 		ghostAvatarList = new Vector<GhostAvatar>();
+		ghostNPCList = new Vector<GhostNPC>();
 		isClientConnected = false;
 		System.out.println("Setting up networking...\n");
 		try { 

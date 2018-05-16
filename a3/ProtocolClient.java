@@ -20,7 +20,6 @@ public class ProtocolClient extends GameConnectionClient {
 	private Vector<GhostAvatar> ghostAvatars;
 	private int numGhosts;
 	private Vector<GhostNPC> ghostNPCs;
-	private int numNPCs;
 	
 	public ProtocolClient(InetAddress remAddr, int remPort,
 	ProtocolType pType, MyGame game) throws IOException { 
@@ -53,8 +52,8 @@ public class ProtocolClient extends GameConnectionClient {
 				UUID ghostID = UUID.fromString(messageTokens[1]);
 				removeGhostAvatar(ghostID);
 			}
-			//if ((messageTokens[0].compareTo("dsfr") == 0 ) // receive "dsfr"
-			// || (messageTokens[0].compareTo("create")==0)) { // format: create, remoteId, x,y,z or dsfr, remoteId, x,y,z
+			
+			// format: create, remoteId, x,y,z or dsfr, remoteId, x,y,z
 			if (messageTokens[0].compareTo("create") == 0) {
 				System.out.println("Obtained create message");
 				UUID ghostID = UUID.fromString(messageTokens[1]);
@@ -109,6 +108,17 @@ public class ProtocolClient extends GameConnectionClient {
 					System.out.println("Could not find Ghost to move");
 				}
 			}
+			if(messageTokens[0].compareTo("mnpc") == 0)
+	         {
+				//System.out.println("Receiving NPC info...");
+	            int ghostID = Integer.parseInt(messageTokens[1]);
+	            Vector3 ghostPosition = Vector3f.createFrom(
+	            Float.parseFloat(messageTokens[2]),
+	            Float.parseFloat(messageTokens[2]),
+	            Float.parseFloat(messageTokens[2]));
+	            
+	            updateGhostNPC(ghostID, ghostPosition);
+	         }
 		} 
 	}
 	
@@ -142,8 +152,23 @@ public class ProtocolClient extends GameConnectionClient {
     }
      
     private void updateGhostNPC(int id, Vector3 position)
-    { 
-    	ghostNPCs.get(id).setPosition(position);
+    {
+    	//Checking to see if there are any NPCs.
+        /*if(ghostNPCs.size() != 0) {
+        	for(GhostNPC npc: ghostNPCs) {
+        		//if
+        	}
+        }*/
+    	if(ghostNPCs.size() == id) {
+    		try {
+				this.createGhostNPC(id, position);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    	}
+    	else {
+    		ghostNPCs.get(id).setPosition(position);
+    	}
     }
     
      

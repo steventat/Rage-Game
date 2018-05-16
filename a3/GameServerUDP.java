@@ -62,35 +62,6 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 			// case where server receives a DETAILS-FOR message
 			if (msgTokens[0].compareTo("dsfr") == 0) { 
 				System.out.println("Received from Details for message from " + msgTokens[5] + "for \n" + msgTokens[1]);
-				/*IClientInfo ci;
-				try {
-					ci = getServerSocket().createClientInfo(senderIP, senderPort);
-					Map<UUID, IClientInfo> clientTable = new HashMap<UUID, IClientInfo>();
-					clientTable = this.getClients(); //Need to look up the UUID of the received client's details.
-					UUID clientID = UUID.fromString(msgTokens[1]);
-					UUID remoteId = null;
-					String[] position = {
-						msgTokens[2],
-						msgTokens[3],
-						msgTokens[4]
-					};
-					System.out.println("Looking up client in client list " + clientID);
-					if(clientTable.containsValue(ci)) {
-						Iterator<Entry<UUID, IClientInfo>> it = clientTable.entrySet().iterator();
-					    while (it.hasNext()) {
-					        Map.Entry pair = (Map.Entry)it.next();
-					        if(pair.getValue() == ci) {
-					        	remoteId = (UUID) pair.getKey();
-					        }
-					    }
-						this.sendDetailsMsg(clientID, remoteId, position);	//How to get remoteID? Is table lookup necessary? 
-					}
-					else {
-						System.out.println("Error: Could not look up received client from details for.");
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}*/
 				UUID clientID = UUID.fromString(msgTokens[1]);
 				UUID remoteId = UUID.fromString(msgTokens[5]);
 				String[] position = {
@@ -195,7 +166,8 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 	        	message += "," + (npcCtrl.getNPC(i)).getX();
 	        	message += "," + (npcCtrl.getNPC(i)).getY();
 	        	message += "," + (npcCtrl.getNPC(i)).getZ();
-	        	System.out.println("Sending NPC info to clients...");
+	        	//System.out.println("Sending NPC info to clients...");
+	        	//System.out.println(message);
 	        	sendPacketToAll(message);
 	        	//. . .
 	        	// also additional cases for receiving messages about NPCs, such as:
