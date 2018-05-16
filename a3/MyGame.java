@@ -109,8 +109,12 @@ class MyGame extends VariableFrameRateGame {
     private Sound oceanSound, hereSound;			// sound     
 	
     private int maxscore;							// maxscore read from JavaScript file
+    private int p1Score = 0;						// score for Player 1			
+    private int p2Score = 0;						// score for Player 2
     
-    
+	private GL4RenderSystem rs;							// HUD
+    private String elapsTimeStr,  dispStr; 				// HUD
+	
 	//I'll leave this static because I wouldn't want two MyGames
 	public static MyGame getGame() {
 		return game;
@@ -456,6 +460,13 @@ class MyGame extends VariableFrameRateGame {
 		hereSound.setLocation(robotNode.getWorldPosition());	
 		oceanSound.setLocation(earthNode.getWorldPosition());	
 		setEarParameters(sm);
+				
+		// build and set HUD
+		rs = (GL4RenderSystem) engine.getRenderSystem();
+		elapsTimeStr = Integer.toString(Math.round(seconds));
+		dispStr = "Time = " + elapsTimeStr + " P1 Score: " + Integer.toString(p1Score)
+				+ " P2 Score: " + Integer.toString(p2Score); 
+		rs.setHUD(dispStr, 15, 15);
 		
 	}
 	
