@@ -453,7 +453,7 @@ class MyGame extends VariableFrameRateGame {
         } 
         
         // sound
-		//hereSound.setLocation(robotNode.getWorldPosition());	
+		hereSound.setLocation(robotNode.getWorldPosition());	
 		oceanSound.setLocation(earthNode.getWorldPosition());	
 		setEarParameters(sm);
 		
@@ -629,24 +629,24 @@ class MyGame extends VariableFrameRateGame {
 		   System.out.println("Audio Manager failed to initialize!");
 		   return;
      } 
-     //resource1 = audioMgr.createAudioResource("Cartoon Hop-SoundBible.com-553158131.wav",AudioResourceType.AUDIO_SAMPLE);
+     resource1 = audioMgr.createAudioResource("Civil War Drummer -SoundBible.com-700036269.wav",AudioResourceType.AUDIO_SAMPLE);
      resource2 = audioMgr.createAudioResource("Water Splash-SoundBible.com-800223477.wav",AudioResourceType.AUDIO_SAMPLE);
-     //hereSound = new Sound(resource1,SoundType.SOUND_EFFECT, 100, true);
+     hereSound = new Sound(resource1,SoundType.SOUND_EFFECT, 100, true);
      oceanSound = new Sound(resource2,SoundType.SOUND_EFFECT, 100, true);
-     //hereSound.initialize(audioMgr);
+     hereSound.initialize(audioMgr);
      oceanSound.initialize(audioMgr);
-     //hereSound.setMaxDistance(10.0f);
-     //hereSound.setMinDistance(0.5f);
-     //hereSound.setRollOff(5.0f);
+     hereSound.setMaxDistance(10.0f);
+     hereSound.setMinDistance(0.5f);
+     hereSound.setRollOff(5.0f);
      oceanSound.setMaxDistance(10.0f);
      oceanSound.setMinDistance(0.5f);
      oceanSound.setRollOff(5.0f);
 //     SceneNode robotN = sm.getSceneNode("robotNode");
 //     SceneNode earthN = sm.getSceneNode("earthNode");
-     //hereSound.setLocation(robotNode.getWorldPosition());
+     hereSound.setLocation(robotNode.getWorldPosition());
      oceanSound.setLocation(earthNode.getWorldPosition());
      setEarParameters(sm);
-     //hereSound.play();
+     hereSound.play();
      oceanSound.play();
    }
    
