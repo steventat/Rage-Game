@@ -24,12 +24,15 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.*;
 import javax.script.*;
 
+import java.util.Scanner;		// get user input from command line
+
 import myGameEngine.*;
 
 import java.net.InetAddress;
 
 import ray.networking.IGameConnection.ProtocolType;	// import networking
 import java.util.Iterator;
+
 import java.util.UUID;								// import networking
 import java.io.IOException;							// import networking
 import java.net.InetAddress;						// import networking
@@ -45,13 +48,22 @@ import ray.physics.PhysicsEngineFactory;    // import physics
 import ray.audio.*;							// import audio
 import com.jogamp.openal.ALFactory;			// import audio
 
+import javax.script.ScriptEngine;			// import script
+import javax.script.ScriptEngineFactory;	// import script
+import javax.script.ScriptEngineManager;	// import script
+import javax.script.ScriptException;		// import script
+
+
 class MyGame extends VariableFrameRateGame {
 	
 	private static MyGame game;
 
-	public static String MAP_TEXTURE_SCRIPT = "scripts\\map_texture.js";
-	public static String MAP_FILE_SCRIPT = "scripts\\map_file.js";
+	public static String MAP_TEXTURE_SCRIPT = "scripts\\map_texture.js";	// script for map texture
+	public static String MAP_FILE_SCRIPT = "scripts\\map_file.js";			// script for map file
+	public static String CONFIG_SCRIPT = "scripts\\config.js";				// script for configuration
 
+	String configScript;						// script after reading
+	
 	private Player player;
 	private OrbitCameraController orbitCamera;
 	private Camera cam;
@@ -67,13 +79,9 @@ class MyGame extends VariableFrameRateGame {
 	private MoveRightAction dMoveR;
 	private YawLeftAction dYawL;
 	private YawRightAction dYawR;
+	
+	//May not need this because we have OrbitCameraController. 
 	//private Camera3PController orbitController, orbitController2;
-	private MoveForwardAction eMoveF;
-	private MoveBackwardAction eMoveB;
-	private MoveLeftAction eMoveL;
-	private MoveRightAction eMoveR;
-	private YawLeftAction eYawL;
-	private YawRightAction eYawR;
 	
 	private String serverAddress;			// network
 	private int serverPort;					// network
@@ -81,6 +89,8 @@ class MyGame extends VariableFrameRateGame {
 	private ProtocolClient protClient;		// network
 	private boolean isClientConnected;		// network
 	private Vector<UUID> gameObjectsToRemove;	// network
+	private Vector<GhostAvatar> ghostAvatarList; //network
+	private Vector<GhostNPC> ghostNPCList; //AI
 
     private SceneNode earthNode, coneNode, groundNode; // physics
     private SceneNode cameraPositionNode;               //  physics
@@ -95,8 +105,15 @@ class MyGame extends VariableFrameRateGame {
     
     private SceneNode robotNode; // set to gloabl for sound
     
-    IAudioManager audioMgr;					// sound
-    Sound oceanSound, hereSound;			// sound     
+    private IAudioManager audioMgr;					// sound
+    private Sound oceanSound, hereSound;			// sound     
+	
+    private int maxscore;							// maxscore read from JavaScript file
+    private int p1Score = 0;						// score for Player 1			
+    private int p2Score = 0;						// score for Player 2
+    
+	private GL4RenderSystem rs;							// HUD
+    private String elapsTimeStr,  dispStr; 				// HUD
 	
 	//I'll leave this static because I wouldn't want two MyGames
 	public static MyGame getGame() {
@@ -113,7 +130,13 @@ class MyGame extends VariableFrameRateGame {
 
 	public static void main(String[] args) {
 		//game = new MyGame(args[0], Integer.parseInt(args[1]));	//Needs to have assets and a3 in the same directory.
-		game = new MyGame("130.86.65.78", 8000);
+
+		System.out.print("Enter Networking Server IP Address: "); 
+/*		Scanner in 	= new Scanner (System.in);			// input IP address
+		game = new MyGame(in.next(), 8000);		
+*/		game = new MyGame("130.86.65.78", 8000);  // hardcored IP
+
+		
 		//Client client;
 		try {
 			game.startup();
@@ -141,6 +164,8 @@ class MyGame extends VariableFrameRateGame {
 	@Override
 	protected void setupWindow(RenderSystem rs, GraphicsEnvironment ge) {
 		rs.createRenderWindow(new DisplayMode(1000, 700, 24, 60), false);
+		//rs.createRenderWindow(new DisplayMode(1000, 700, 24, 60), true);
+		//rs.createRenderWindow(true);
 	}
 
 	@Override
@@ -159,31 +184,68 @@ class MyGame extends VariableFrameRateGame {
 	protected void setupScene(Engine eng, SceneManager sm) throws IOException {
 		setupNetworking();
 		im = new GenericInputManager();	//Initializing input manager for controllers
+
+		// Java Script
+		ScriptEngineManager factory = new ScriptEngineManager();
+		ScriptEngine jsEngine = factory.getEngineByName("js");		
 		
 		this.sm = sm;
-		ScriptEngineManager factory = new ScriptEngineManager();
-		ScriptEngine jsEngine = factory.getEngineByName("js");
-		sm.getAmbientLight().setIntensity(new Color(0.5f, 0.5f, 0.5f));
+		
+        // ambient light
+		//sm.getAmbientLight().setIntensity(new Color(0.5f, 0.5f, 0.5f));
+		sm.getAmbientLight().setIntensity(new Color(.1f, .1f, .1f));
+		
+		// Positional Light
+        Light plight = sm.createLight("testLamp1", Light.Type.POINT);
+        plight.setAmbient(new Color(.3f, .3f, .3f));
+        plight.setDiffuse(new Color(.7f, .7f, .7f));
+        plight.setSpecular(new Color(1.0f, 1.0f, 1.0f));
+        plight.setRange(5f);
+        SceneNode plightNode = sm.getRootSceneNode().createChildSceneNode("plightNode");
+        plightNode.attachObject(plight);
+
+        // Spot Light
+        Light spotLight = sm.createLight("spotLight",  Light.Type.SPOT);
+        spotLight.setAmbient(new Color(.4f, .3f, .5f));
+        spotLight.setDiffuse(new Color(.7f, .3f, .5f));
+        spotLight.setSpecular(new Color(1.0f, 1.0f, 1.0f));
+        spotLight.setRange(3f);
+        SceneNode spotLightNode = sm.getRootSceneNode().createChildSceneNode("spotLightNode");
+        spotLightNode.attachObject(spotLight);
+        
 		SceneNode cameraNode = sm.getRootSceneNode().createChildSceneNode("CameraNode");
 		cameraNode.attachObject(cam);
 		
+//		LightManager lightMggr = new LightManager(this);
+//		lightMgr.putLightSpotFocusOnNode(sm.getSceneNode("hatoflifeNode"), "L1", new Color(75,72,25));
+//		LightMgr.putLightSpotFocusOnNode(sm.getSceneNode("hatofLifeNode"), "L2", new Color(255, 55, 35));
+		
 		//Initialize Player
 		player = new Player(sm);
+		
+		// Load map
 		map = new Map(eng, sm, readScript(jsEngine, MAP_FILE_SCRIPT), 
 				readScript(jsEngine, MAP_TEXTURE_SCRIPT));
+		
+		// Load configuration file
+		configScript = readScript(jsEngine, CONFIG_SCRIPT);		
+		maxscore = (int) jsEngine.get("maxscore");
+		System.out.println("MAXSCORE: " + maxscore);		// print to command line the maxscore
+		
 		
 		//Initialize Orbit Camera
 		orbitCamera = new OrbitCameraController(cameraNode, player.getNode(), cam);
 		setupSkybox(eng, sm);
 		
 		//Initializing actions and connecting to nodes.
-		SceneNode playerN = sm.getSceneNode("playerNode");
-        dMoveF = new MoveForwardAction(playerN);
-        dMoveB = new MoveBackwardAction(playerN);
-        dMoveL = new MoveLeftAction(playerN);
-        dMoveR = new MoveRightAction(playerN);
-        dYawL = new YawLeftAction(playerN);
-        dYawR = new YawRightAction(playerN);
+		//SceneNode playerN = sm.getSceneNode("playerNode");
+		
+        dMoveF = new MoveForwardAction(playerNode, protClient);
+        dMoveB = new MoveBackwardAction(playerNode, protClient);
+        dMoveL = new MoveLeftAction(playerNode, protClient);
+        dMoveR = new MoveRightAction(playerNode, protClient);
+        dYawL = new YawLeftAction(playerNode, protClient);
+        dYawR = new YawRightAction(playerNode, protClient);
 		setupInputs(sm);
 		
 		//Creating the sea
@@ -398,6 +460,13 @@ class MyGame extends VariableFrameRateGame {
 		hereSound.setLocation(robotNode.getWorldPosition());	
 		oceanSound.setLocation(earthNode.getWorldPosition());	
 		setEarParameters(sm);
+				
+		// build and set HUD
+		rs = (GL4RenderSystem) engine.getRenderSystem();
+		elapsTimeStr = Integer.toString(Math.round(seconds));
+		dispStr = "Time = " + elapsTimeStr + " P1 Score: " + Integer.toString(p1Score)
+				+ " P2 Score: " + Integer.toString(p2Score); 
+		rs.setHUD(dispStr, 15, 15);
 		
 	}
 	
@@ -408,6 +477,8 @@ class MyGame extends VariableFrameRateGame {
 	
 	private void setupNetworking() { 
 		gameObjectsToRemove = new Vector<UUID>();
+		ghostAvatarList = new Vector<GhostAvatar>();
+		ghostNPCList = new Vector<GhostNPC>();
 		isClientConnected = false;
 		System.out.println("Setting up networking...\n");
 		try { 
@@ -446,7 +517,8 @@ class MyGame extends VariableFrameRateGame {
 	}
 	
 	public void addGhostAvatarToGameWorld(GhostAvatar avatar) throws IOException { 
-		if (avatar != null) { 
+		if (avatar != null) {
+			System.out.println("Don't forget to increment the ghost entity name");
 			Entity ghostE = sm.createEntity("ghost", "dolphinHighPoly.obj");
 			ghostE.setPrimitive(Primitive.TRIANGLES);
 			SceneNode ghostN = sm.getRootSceneNode().
@@ -455,14 +527,15 @@ class MyGame extends VariableFrameRateGame {
 			ghostN.setLocalPosition(avatar.getPosition());
 			avatar.setNode(ghostN);
 			avatar.setEntity(ghostE);
+			ghostAvatarList.add(avatar);
 			//avatar.setPosition(node’s position... maybe redundant);
 		}
 	}
 	
 	public void addGhostNPCtoGameWorld(GhostNPC npc) throws IOException {
-		//Has a problem with id. Should it be an int or an UUID? Prof code has as an int. 
+		System.out.println("Adding GhostNPC to Game World.");
 		if (npc != null) { 
-			Entity ghostE = sm.createEntity("ghost", "dolphinHighPoly.obj");
+			Entity ghostE = sm.createEntity("ghostNPC", "dolphinHighPoly.obj");
 			ghostE.setPrimitive(Primitive.TRIANGLES);
 			SceneNode ghostN = sm.getRootSceneNode().
 			createChildSceneNode(Integer.toString(npc.getID()));
@@ -476,6 +549,15 @@ class MyGame extends VariableFrameRateGame {
 	
 	public void removeGhostAvatarFromGameWorld(GhostAvatar avatar) { 
 		if(avatar != null) gameObjectsToRemove.add(avatar.getID());
+	}
+	
+	public GhostAvatar getGhostAvatarByID(UUID ghostID) throws Exception {
+		for(GhostAvatar ghost: this.ghostAvatarList) {
+			if(ghost.getID().compareTo(ghostID) == 0) {
+				return ghost;
+			}
+		}
+		throw new Exception("Could not find the Ghost by ID"); //Should create own classes for exception later.	
 	}
 	
 	private void initPhysicsSystem() { 
@@ -558,7 +640,7 @@ class MyGame extends VariableFrameRateGame {
 		   System.out.println("Audio Manager failed to initialize!");
 		   return;
      } 
-     resource1 = audioMgr.createAudioResource("Cartoon Hop-SoundBible.com-553158131.wav",AudioResourceType.AUDIO_SAMPLE);
+     resource1 = audioMgr.createAudioResource("Civil War Drummer -SoundBible.com-700036269.wav",AudioResourceType.AUDIO_SAMPLE);
      resource2 = audioMgr.createAudioResource("Water Splash-SoundBible.com-800223477.wav",AudioResourceType.AUDIO_SAMPLE);
      hereSound = new Sound(resource1,SoundType.SOUND_EFFECT, 100, true);
      oceanSound = new Sound(resource2,SoundType.SOUND_EFFECT, 100, true);
