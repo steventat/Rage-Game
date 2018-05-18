@@ -135,9 +135,9 @@ class MyGame extends VariableFrameRateGame {
 		//game = new MyGame(args[0], Integer.parseInt(args[1]));	//Needs to have assets and a3 in the same directory.
 
 		System.out.print("Enter Networking Server IP Address: "); 
-/*		Scanner in 	= new Scanner (System.in);			// input IP address
+		Scanner in 	= new Scanner (System.in);			// input IP address
 		game = new MyGame(in.next(), 8000);		
-*/		game = new MyGame("130.86.65.78", 8000);  // hardcored IP
+//		game = new MyGame("130.86.65.78", 8000);  // hardcored IP
 
 		
 		//Client client;
