@@ -107,7 +107,8 @@ class MyGame extends VariableFrameRateGame {
     
     private IAudioManager audioMgr;					// sound
     private Sound oceanSound, hereSound;			// sound     
-	
+	private boolean soundToggle	= true;				// sound	PRESS 'O' to enable and disable sound				
+    
     private int maxscore;							// maxscore read from JavaScript file
     private int p1Score = 0;						// score for Player 1			
     private int p2Score = 0;						// score for Player 2
@@ -184,6 +185,9 @@ class MyGame extends VariableFrameRateGame {
 	protected void setupScene(Engine eng, SceneManager sm) throws IOException {
 		setupNetworking();
 		im = new GenericInputManager();	//Initializing input manager for controllers
+		
+		//Activate physics
+		running = false;
 
 		// Java Script
 		ScriptEngineManager factory = new ScriptEngineManager();
@@ -236,17 +240,6 @@ class MyGame extends VariableFrameRateGame {
 		//Initialize Orbit Camera
 		orbitCamera = new OrbitCameraController(cameraNode, player.getNode(), cam);
 		setupSkybox(eng, sm);
-		
-		//Initializing actions and connecting to nodes.
-		//SceneNode playerN = sm.getSceneNode("playerNode");
-		
-        dMoveF = new MoveForwardAction(playerNode, protClient);
-        dMoveB = new MoveBackwardAction(playerNode, protClient);
-        dMoveL = new MoveLeftAction(playerNode, protClient);
-        dMoveR = new MoveRightAction(playerNode, protClient);
-        dYawL = new YawLeftAction(playerNode, protClient);
-        dYawR = new YawRightAction(playerNode, protClient);
-		setupInputs(sm);
 		
 		//Creating the sea
 		/*ManualObject sea = ManualGraphics.makePlane("default.mtl", "default.png", Color.BLUE);
@@ -326,7 +319,27 @@ class MyGame extends VariableFrameRateGame {
         groundNode.setLocalPosition(0, 0, 0);       // set ground to xyz to 0
         initPhysicsSystem();
         createRagePhysicsWorld();
-         
+        
+      //Initializing actions and connecting to nodes.
+  		if(running == true) {
+  	        dMoveF = new MoveForwardAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveB = new MoveBackwardAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveL = new MoveLeftAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveR = new MoveRightAction(playerNode, playerPhysObj, protClient, running);
+  	        dYawL = new YawLeftAction(playerNode, playerPhysObj, protClient, running);
+  	        dYawR = new YawRightAction(playerNode, playerPhysObj, protClient, running);
+  			setupInputs(sm);
+  		}
+  		
+  		if(running == false) {
+  			dMoveF = new MoveForwardAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveB = new MoveBackwardAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveL = new MoveLeftAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveR = new MoveRightAction(playerNode, playerPhysObj, protClient, running);
+  	        dYawL = new YawLeftAction(playerNode, playerPhysObj, protClient, running);
+  	        dYawR = new YawRightAction(playerNode, playerPhysObj, protClient, running);
+  			setupInputs(sm);
+  		}
         System.out.println("Press P to start the physics engine!");
         
         initAudio(sm);	// SOUND
@@ -457,9 +470,11 @@ class MyGame extends VariableFrameRateGame {
         } 
         
         // sound
-		hereSound.setLocation(robotNode.getWorldPosition());	
-		oceanSound.setLocation(earthNode.getWorldPosition());	
-		setEarParameters(sm);
+        if (soundToggle) {
+    		hereSound.setLocation(robotNode.getWorldPosition());	
+    		oceanSound.setLocation(earthNode.getWorldPosition());	
+    		setEarParameters(sm);
+        }
 				
 		// build and set HUD
 		rs = (GL4RenderSystem) engine.getRenderSystem();
@@ -534,8 +549,9 @@ class MyGame extends VariableFrameRateGame {
 	
 	public void addGhostNPCtoGameWorld(GhostNPC npc) throws IOException {
 		System.out.println("Adding GhostNPC to Game World.");
-		if (npc != null) { 
-			Entity ghostE = sm.createEntity("ghostNPC", "dolphinHighPoly.obj");
+		if (npc != null) {
+			
+			Entity ghostE = sm.createEntity("ghostNPC" + npc.getID(), "dolphinHighPoly.obj");
 			ghostE.setPrimitive(Primitive.TRIANGLES);
 			SceneNode ghostN = sm.getRootSceneNode().
 			createChildSceneNode(Integer.toString(npc.getID()));
@@ -573,12 +589,12 @@ class MyGame extends VariableFrameRateGame {
 		float up[] = {0,1,0};
 		double[] temptf;
 		
-		/*System.out.println("Adding player Physics");
+		System.out.println("Adding player Physics");
 		temptf = toDoubleArray(playerNode.getLocalTransform().toFloatArray());
 		playerPhysObj = physicsEngine.addBoxObject(physicsEngine.nextUID(), mass, temptf, up);
 		//playerPhysObj.setBounciness(1.0f);
 		playerPhysObj.setFriction(1.0f);
-		playerNode.setPhysicsObject(playerPhysObj);*/
+		playerNode.setPhysicsObject(playerPhysObj);
          
 		temptf = toDoubleArray(earthNode.getLocalTransform().toFloatArray());
 		earthPhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
@@ -659,7 +675,51 @@ class MyGame extends VariableFrameRateGame {
      setEarParameters(sm);
      hereSound.play();
      oceanSound.play();
-   } 
+   }
+   
+   public void keyPressed(KeyEvent evt) {
+	   int keyCode = evt.getKeyCode();
+		switch(keyCode) {
+		   case KeyEvent.VK_E:
+			   orbitCamera.setRotateLeft(true);
+			   break;
+		   case KeyEvent.VK_Q:
+			   orbitCamera.setRotateRight(true);
+			   break;
+		   case KeyEvent.VK_SPACE:
+				this.doAttack();
+				break;
+		   case KeyEvent.VK_W:
+				this.doNWalk();
+				break;
+		   case KeyEvent.VK_O:
+			   soundToggle = ! soundToggle;
+			   if (soundToggle == true) 
+				   audioMgr.resumeAllSounds();
+			   else
+				   audioMgr.pauseAllSounds();;
+			   break;
+		}
+   }
+   
+   public void keyReleased(KeyEvent evt) {
+	   int keyCode = evt.getKeyCode();
+		switch(keyCode) {
+		   case KeyEvent.VK_E:
+			   orbitCamera.setRotateLeft(false);
+			   break;
+		   case KeyEvent.VK_Q:
+			   orbitCamera.setRotateRight(false);
+			   break;
+		   case KeyEvent.VK_SPACE:
+				this.doAttack();
+				break;
+		}
+   }
+
+	public SceneNode getPlayerNode() {
+		return playerNode;
+	}
 
 }
 
