@@ -186,7 +186,7 @@ class MyGame extends VariableFrameRateGame {
 		im = new GenericInputManager();	//Initializing input manager for controllers
 		
 		//Activate physics
-		running = true;
+		running = false;
 
 		// Java Script
 		ScriptEngineManager factory = new ScriptEngineManager();
