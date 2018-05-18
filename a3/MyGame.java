@@ -240,27 +240,6 @@ class MyGame extends VariableFrameRateGame {
 		orbitCamera = new OrbitCameraController(cameraNode, player.getNode(), cam);
 		setupSkybox(eng, sm);
 		
-		//Initializing actions and connecting to nodes.
-		if(running == true) {
-	        dMoveF = new MoveForwardAction(playerNode, playerPhysObj, protClient, running);
-	        dMoveB = new MoveBackwardAction(playerNode, playerPhysObj, protClient, running);
-	        dMoveL = new MoveLeftAction(playerNode, playerPhysObj, protClient, running);
-	        dMoveR = new MoveRightAction(playerNode, playerPhysObj, protClient, running);
-	        dYawL = new YawLeftAction(playerNode, playerPhysObj, protClient, running);
-	        dYawR = new YawRightAction(playerNode, playerPhysObj, protClient, running);
-			setupInputs(sm);
-		}
-		
-		if(running == false) {
-			dMoveF = new MoveForwardAction(playerNode, playerPhysObj, protClient, running);
-	        dMoveB = new MoveBackwardAction(playerNode, playerPhysObj, protClient, running);
-	        dMoveL = new MoveLeftAction(playerNode, playerPhysObj, protClient, running);
-	        dMoveR = new MoveRightAction(playerNode, playerPhysObj, protClient, running);
-	        dYawL = new YawLeftAction(playerNode, playerPhysObj, protClient, running);
-	        dYawR = new YawRightAction(playerNode, playerPhysObj, protClient, running);
-			setupInputs(sm);
-		}
-		
 		//Creating the sea
 		/*ManualObject sea = ManualGraphics.makePlane("default.mtl", "default.png", Color.BLUE);
 		SceneNode seaNode = sm.getRootSceneNode().createChildSceneNode("SeaNode");
@@ -339,7 +318,27 @@ class MyGame extends VariableFrameRateGame {
         groundNode.setLocalPosition(0, 0, 0);       // set ground to xyz to 0
         initPhysicsSystem();
         createRagePhysicsWorld();
-         
+        
+      //Initializing actions and connecting to nodes.
+  		if(running == true) {
+  	        dMoveF = new MoveForwardAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveB = new MoveBackwardAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveL = new MoveLeftAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveR = new MoveRightAction(playerNode, playerPhysObj, protClient, running);
+  	        dYawL = new YawLeftAction(playerNode, playerPhysObj, protClient, running);
+  	        dYawR = new YawRightAction(playerNode, playerPhysObj, protClient, running);
+  			setupInputs(sm);
+  		}
+  		
+  		if(running == false) {
+  			dMoveF = new MoveForwardAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveB = new MoveBackwardAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveL = new MoveLeftAction(playerNode, playerPhysObj, protClient, running);
+  	        dMoveR = new MoveRightAction(playerNode, playerPhysObj, protClient, running);
+  	        dYawL = new YawLeftAction(playerNode, playerPhysObj, protClient, running);
+  	        dYawR = new YawRightAction(playerNode, playerPhysObj, protClient, running);
+  			setupInputs(sm);
+  		}
         System.out.println("Press P to start the physics engine!");
         
         initAudio(sm);	// SOUND

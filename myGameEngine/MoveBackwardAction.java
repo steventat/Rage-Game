@@ -30,11 +30,15 @@ public class MoveBackwardAction extends AbstractInputAction {
 
 	public void performAction(float arg0, Event arg1) {
 		if(physOn) {
+			Matrix3f dir = (Matrix3f) mainNode.getWorldRotation();
+			Vector3 force = (Vector3) Vector3f.createFrom(0.0f, 0.0f, -5.0f);
+			Vector3f dirForce = (Vector3f) dir.mult(force);
+			playerPhys.applyForce(dirForce.x(), dirForce.y(), dirForce.z(), 0.0f, 0.0f, 0.0f);
 		}
 		else {
 			mainNode.moveBackward(0.01f);
-			protClient.sendMoveMessage(mainNode.getWorldPosition());
 		}
 		System.out.println("Moving backward");
+		protClient.sendMoveMessage(mainNode.getWorldPosition());
 	}
 }
