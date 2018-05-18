@@ -485,6 +485,9 @@ class MyGame extends VariableFrameRateGame {
 				+ " P2 Score: " + Integer.toString(p2Score); 
 		rs.setHUD(dispStr, 15, 15);
 		
+		if (lightToggle) {
+			
+		}
 	}
 	
 	public void setIsConnected(boolean b) {
@@ -703,8 +706,26 @@ class MyGame extends VariableFrameRateGame {
 			   break;
 		   case KeyEvent.VK_P:
 			   if (lightToggle == true)
-				
-			break;
+			   {
+/*				    Light spotLight = sm.createLight("spotLight",  Light.Type.SPOT);
+			        spotLight.setAmbient(new Color(.4f, .3f, .5f));
+			        spotLight.setDiffuse(new Color(.7f, .3f, .5f));
+			        spotLight.setSpecular(new Color(1.0f, 1.0f, 1.0f));
+			        spotLight.setRange(3f);
+			        SceneNode spotLightNode = sm.getRootSceneNode().createChildSceneNode("spotLightNode");
+			        spotLightNode.attachObject(spotLight);
+*/			   }
+			   else
+			   {
+/*			        Light spotLight = sm.createLight("spotLight",  Light.Type.SPOT);
+			        spotLight.setAmbient(new Color(.4f, .3f, .5f));
+			        spotLight.setDiffuse(new Color(.7f, .3f, .5f));
+			        spotLight.setSpecular(new Color(1.0f, 1.0f, 1.0f));
+			        spotLight.setRange(3f);
+			        SceneNode spotLightNode = sm.getRootSceneNode().createChildSceneNode("spotLightNode");
+			        spotLightNode.attachObject(spotLight);
+*/			   }
+			   break;
 			   
 		}
    }
