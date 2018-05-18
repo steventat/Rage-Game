@@ -20,7 +20,7 @@ public class NPCcontroller
 		tickStartTime = System.nanoTime();
 		lastThinkUpdateTime = thinkStartTime;
 		lastTickUpdateTime = tickStartTime;
-		setupNPC();
+		setUpNPCs();
 		setupBehaviorTree();
 		npcLoop();
 	 }
@@ -40,15 +40,14 @@ public class NPCcontroller
 	public NPC getNPC(int index) {
 		return NPClist[index];
 	}
-	
-	 public void setupNPC() {
-	 
-	 }
 	 
 	 public void setUpNPCs() {
 		person = new NPC(1.0, 1.0, 1.0);
 		NPClist[0] = new NPC(0.0, 0.0, 0.0);
 		NPClist[1] = person;
+		for(int i = 0; i < NPClist.length; i++) {
+			NPClist[i].setID(i);
+		}
 		System.out.println("NPCs: " + NPClist);
 	 }
 	 
@@ -67,7 +66,7 @@ public class NPCcontroller
 				 bt.update(elapsedThinkMilliSecs);
 			 }
 			 Thread.yield();
-		 } 
+		 }
 	 }
 	
 	 public void setupBehaviorTree() { 

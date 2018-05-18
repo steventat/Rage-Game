@@ -31,7 +31,7 @@ public class NetworkingServer {
 			  long frameStartTime = System.nanoTime();
 			  float elapMilSecs = (frameStartTime-lastUpdateTime)/(1000000.0f);
 			  if (elapMilSecs >= 50.0f)
-			  { 
+			  {
 				  lastUpdateTime = frameStartTime;
 				  npcCtrl.updateNPCs();
 				  thisUDPServer.sendNPCinfo();

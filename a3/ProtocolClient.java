@@ -108,17 +108,16 @@ public class ProtocolClient extends GameConnectionClient {
 					System.out.println("Could not find Ghost to move");
 				}
 			}
-			if(messageTokens[0].compareTo("mnpc") == 0)
-	         {
+			if(messageTokens[0].compareTo("mnpc") == 0) {
 				//System.out.println("Receiving NPC info...");
 	            int ghostID = Integer.parseInt(messageTokens[1]);
 	            Vector3 ghostPosition = Vector3f.createFrom(
 	            Float.parseFloat(messageTokens[2]),
-	            Float.parseFloat(messageTokens[2]),
-	            Float.parseFloat(messageTokens[2]));
+	            Float.parseFloat(messageTokens[3]),
+	            Float.parseFloat(messageTokens[4]));
 	            
 	            updateGhostNPC(ghostID, ghostPosition);
-	         }
+	        }
 		} 
 	}
 	
@@ -167,6 +166,7 @@ public class ProtocolClient extends GameConnectionClient {
 			}
     	}
     	else {
+    		this.askForNPCFollow(game.getPlayerNode().getLocalPosition());
     		ghostNPCs.get(id).setPosition(position);
     	}
     }
@@ -174,8 +174,17 @@ public class ProtocolClient extends GameConnectionClient {
      
     public void askForNPCinfo() { 
     	try {
-    		System.out.println("Asking for NPC info...");
     		sendPacket(new String("needNPC," + id.toString()));
+   	 	} catch (IOException e) { 
+   	 		e.printStackTrace();
+   	 	}
+    }
+    
+    public void askForNPCFollow(Vector3 pos) { 
+    	try {
+    		String message = new String("follow," + id.toString());
+    		message += "," + pos.x()+"," + pos.y() + "," + pos.z();
+    		sendPacket(message);
    	 	} catch (IOException e) { 
    	 		e.printStackTrace();
    	 	}

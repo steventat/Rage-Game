@@ -91,6 +91,9 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 		    { 
 		    	//. . . 
 		    }
+		    if(msgTokens[0].compareTo("follow") == 0) {
+		    	
+		    }
 		}
 	}
 	public void sendJoinedMessage(UUID clientID, boolean success) { // format: join, success or join, failure

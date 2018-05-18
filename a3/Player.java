@@ -27,7 +27,7 @@ class Player extends Moveable {
 		
 		SkeletalEntity playerEntity = sm.createSkeletalEntity("walker", "walker.rkm", "walker.rks");
 		SceneNode playerNode = sm.getRootSceneNode().createChildSceneNode("playerNode");
-		playerNode.moveUp(0.1f);
+		playerNode.moveUp(0.3f);
 		playerNode.scale(0.1f, 0.1f, 0.1f);
 		playerNode.attachObject(playerEntity);
 		playerEntity.loadAnimation("normal_walk", "normal_walk.rka");

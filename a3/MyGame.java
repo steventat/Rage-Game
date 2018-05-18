@@ -180,6 +180,9 @@ class MyGame extends VariableFrameRateGame {
 	protected void setupScene(Engine eng, SceneManager sm) throws IOException {
 		setupNetworking();
 		im = new GenericInputManager();	//Initializing input manager for controllers
+		
+		//Activate physics
+		running = true;
 
 		// Java Script
 		ScriptEngineManager factory = new ScriptEngineManager();
@@ -234,15 +237,25 @@ class MyGame extends VariableFrameRateGame {
 		setupSkybox(eng, sm);
 		
 		//Initializing actions and connecting to nodes.
-		//SceneNode playerN = sm.getSceneNode("playerNode");
+		if(running == true) {
+	        dMoveF = new MoveForwardAction(playerPhysObj, protClient, running);
+	        dMoveB = new MoveBackwardAction(playerPhysObj, protClient, running);
+	        dMoveL = new MoveLeftAction(playerPhysObj, protClient, running);
+	        dMoveR = new MoveRightAction(playerPhysObj, protClient, running);
+	        dYawL = new YawLeftAction(playerPhysObj, protClient, running);
+	        dYawR = new YawRightAction(playerPhysObj, protClient, running);
+			setupInputs(sm);
+		}
 		
-        dMoveF = new MoveForwardAction(playerNode, protClient);
-        dMoveB = new MoveBackwardAction(playerNode, protClient);
-        dMoveL = new MoveLeftAction(playerNode, protClient);
-        dMoveR = new MoveRightAction(playerNode, protClient);
-        dYawL = new YawLeftAction(playerNode, protClient);
-        dYawR = new YawRightAction(playerNode, protClient);
-		setupInputs(sm);
+		if(running == false) {
+	        dMoveF = new MoveForwardAction(playerNode, protClient, running);
+	        dMoveB = new MoveBackwardAction(playerNode, protClient, running);
+	        dMoveL = new MoveLeftAction(playerNode, protClient, running);
+	        dMoveR = new MoveRightAction(playerNode, protClient, running);
+	        dYawL = new YawLeftAction(playerNode, protClient, running);
+	        dYawR = new YawRightAction(playerNode, protClient, running);
+			setupInputs(sm);
+		}
 		
 		//Creating the sea
 		/*ManualObject sea = ManualGraphics.makePlane("default.mtl", "default.png", Color.BLUE);
@@ -564,11 +577,11 @@ class MyGame extends VariableFrameRateGame {
 		double[] temptf;
 		
 		System.out.println("Adding player Physics");
-		/*temptf = toDoubleArray(playerNode.getLocalTransform().toFloatArray());
+		temptf = toDoubleArray(playerNode.getLocalTransform().toFloatArray());
 		playerPhysObj = physicsEngine.addBoxObject(physicsEngine.nextUID(), mass, temptf, up);
 		//playerPhysObj.setBounciness(1.0f);
 		playerPhysObj.setFriction(1.0f);
-		playerNode.setPhysicsObject(playerPhysObj);*/
+		playerNode.setPhysicsObject(playerPhysObj);
          
 		temptf = toDoubleArray(earthNode.getLocalTransform().toFloatArray());
 		earthPhysObj = physicsEngine.addSphereObject(physicsEngine.nextUID(),mass, temptf, 2.0f);
@@ -674,6 +687,10 @@ class MyGame extends VariableFrameRateGame {
 			   break;
 		}
    }
+
+	public SceneNode getPlayerNode() {
+		return playerNode;
+	}
 
 }
 

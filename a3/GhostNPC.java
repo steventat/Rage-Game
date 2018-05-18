@@ -12,23 +12,20 @@ public class GhostNPC {
      private Entity entity;
      private Vector3 position;
      
-    public GhostNPC(int id, Vector3 position) // constructor
-    { 
+    public GhostNPC(int id, Vector3 position) { // constructor 
         this.id = id;
         this.position = position;
     }
      
-     public void setPosition(Vector3 position)
-     { 
-        node.setLocalPosition(position);
-     }
+    public void setPosition(Vector3 position) { 
+    	 node.setLocalPosition(position);
+    }
       
-     public Vector3 getPosition()
-     { 
-        return position;
-     }
+    public Vector3 getPosition() { 
+    	return position;
+    }
      
-     public int getID() {
+    public int getID() {
  		return this.id;
  	}
  	public void setNode(SceneNode ghostN) {
