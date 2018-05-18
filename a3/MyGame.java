@@ -683,6 +683,9 @@ class MyGame extends VariableFrameRateGame {
 		   case KeyEvent.VK_E:
 			   orbitCamera.setRotateRight(true);
 			   break;
+		   case KeyEvent.VK_SPACE:
+				this.doAttack();
+				break;
 		}
    }
    
@@ -695,6 +698,9 @@ class MyGame extends VariableFrameRateGame {
 		   case KeyEvent.VK_E:
 			   orbitCamera.setRotateRight(false);
 			   break;
+		   case KeyEvent.VK_SPACE:
+				this.doAttack();
+				break;
 		}
    }
 
