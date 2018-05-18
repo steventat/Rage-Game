@@ -677,14 +677,17 @@ class MyGame extends VariableFrameRateGame {
    public void keyPressed(KeyEvent evt) {
 	   int keyCode = evt.getKeyCode();
 		switch(keyCode) {
-		   case KeyEvent.VK_Q:
+		   case KeyEvent.VK_E:
 			   orbitCamera.setRotateLeft(true);
 			   break;
-		   case KeyEvent.VK_E:
+		   case KeyEvent.VK_Q:
 			   orbitCamera.setRotateRight(true);
 			   break;
 		   case KeyEvent.VK_SPACE:
 				this.doAttack();
+				break;
+		   case KeyEvent.VK_W:
+				this.doNWalk();
 				break;
 		}
    }
@@ -692,10 +695,10 @@ class MyGame extends VariableFrameRateGame {
    public void keyReleased(KeyEvent evt) {
 	   int keyCode = evt.getKeyCode();
 		switch(keyCode) {
-		   case KeyEvent.VK_Q:
+		   case KeyEvent.VK_E:
 			   orbitCamera.setRotateLeft(false);
 			   break;
-		   case KeyEvent.VK_E:
+		   case KeyEvent.VK_Q:
 			   orbitCamera.setRotateRight(false);
 			   break;
 		   case KeyEvent.VK_SPACE:
