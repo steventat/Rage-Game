@@ -14,3 +14,8 @@
 /Player.class
 /ProtocolClient.class
 /TestGameClient.class
+/AvatarNear.class
+/GoWalk.class
+/OneSecPassed.class
+/GetSmall.class
+/GetBig.class

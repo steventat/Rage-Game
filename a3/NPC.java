@@ -31,4 +31,24 @@ public class NPC {
 		return null;
     	
     }
+
+	public void goWalk() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public double getSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public void getSmall() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void goBig() {
+		// TODO Auto-generated method stub
+		
+	}
 }

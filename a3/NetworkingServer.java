@@ -5,47 +5,26 @@ import ray.networking.IGameConnection.ProtocolType;
 
 public class NetworkingServer {
 	private GameServerUDP thisUDPServer;
-//	private GameServerTCP thisTCPServer;
 	
 	private NPCcontroller npcCtrl;
-	//GameAIServerTCP tcpServer;
-	//GameServerUDP udpServer;
 	
 	private long startTime;
 	private long lastUpdateTime;
 	
 	public NetworkingServer(int serverPort, String protocol) { 
-		try { 
-//			if(protocol.toUpperCase().compareTo("TCP") == 0) { 	// TCP NOT ADDED
-//				thisTCPServer = new GameServerTCP(serverPort);
-//			}
-//			else { 
+		try {  
 				thisUDPServer = new GameServerUDP(serverPort);
 				
 				startTime = System.nanoTime();
 				lastUpdateTime = startTime;
-				//npcCtrl = new NPCcontroller();
 				npcCtrl = thisUDPServer.getController();
-			 // start networking TCP server (as before)
-			 // start NPC control loop
 				npcCtrl.setUpNPCs();
 				npcLoop();
-//			}
 		}
 		catch (IOException e) { 
 			e.printStackTrace();
 		} 
 	}
-
-	 /*public NetworkingServer(int id) { // constructor
-		 startTime = System.nanoTime();
-		 lastUpdateTime = startTime;
-		 npcCtrl = new NPCcontroller();
-	 // start networking TCP server (as before)
-	 // start NPC control loop
-		 npcCtrl.setUpNPCs();
-		 npcLoop();
-	 }*/
 	 
 	 public void npcLoop() { // NPC control loop
 		 while (true) {

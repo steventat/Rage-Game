@@ -181,9 +181,6 @@ public class ProtocolClient extends GameConnectionClient {
    	 	}
     }
 
-	/*Also need functions to instantiate ghost avatar, remove a ghost avatar,
-	look up a ghost in the ghost table, update a ghost's position, and
-	accessors as needed.*/
 	public void sendJoinMessage() { // format: join, localId
 		try { 
 			System.out.println("Sending join message");

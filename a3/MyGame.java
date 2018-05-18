@@ -523,8 +523,9 @@ class MyGame extends VariableFrameRateGame {
 	
 	public void addGhostNPCtoGameWorld(GhostNPC npc) throws IOException {
 		System.out.println("Adding GhostNPC to Game World.");
-		if (npc != null) { 
-			Entity ghostE = sm.createEntity("ghostNPC", "dolphinHighPoly.obj");
+		if (npc != null) {
+			
+			Entity ghostE = sm.createEntity("ghostNPC" + npc.getID(), "dolphinHighPoly.obj");
 			ghostE.setPrimitive(Primitive.TRIANGLES);
 			SceneNode ghostN = sm.getRootSceneNode().
 			createChildSceneNode(Integer.toString(npc.getID()));
@@ -562,8 +563,8 @@ class MyGame extends VariableFrameRateGame {
 		float up[] = {0,1,0};
 		double[] temptf;
 		
-		/*System.out.println("Adding player Physics");
-		temptf = toDoubleArray(playerNode.getLocalTransform().toFloatArray());
+		System.out.println("Adding player Physics");
+		/*temptf = toDoubleArray(playerNode.getLocalTransform().toFloatArray());
 		playerPhysObj = physicsEngine.addBoxObject(physicsEngine.nextUID(), mass, temptf, up);
 		//playerPhysObj.setBounciness(1.0f);
 		playerPhysObj.setFriction(1.0f);

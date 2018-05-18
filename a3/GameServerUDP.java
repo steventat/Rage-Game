@@ -180,4 +180,9 @@ public class GameServerUDP extends GameConnectionServer < UUID > {
 	public NPCcontroller getController() {
 		return npcCtrl;
 	}
+
+	public void sendCheckForAvatarNear() {
+		// TODO Auto-generated method stub
+		
+	}
 }
