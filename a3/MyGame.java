@@ -238,22 +238,22 @@ class MyGame extends VariableFrameRateGame {
 		
 		//Initializing actions and connecting to nodes.
 		if(running == true) {
-	        dMoveF = new MoveForwardAction(playerPhysObj, protClient, running);
-	        dMoveB = new MoveBackwardAction(playerPhysObj, protClient, running);
-	        dMoveL = new MoveLeftAction(playerPhysObj, protClient, running);
-	        dMoveR = new MoveRightAction(playerPhysObj, protClient, running);
-	        dYawL = new YawLeftAction(playerPhysObj, protClient, running);
-	        dYawR = new YawRightAction(playerPhysObj, protClient, running);
+	        dMoveF = new MoveForwardAction(playerNode, playerPhysObj, protClient, running);
+	        dMoveB = new MoveBackwardAction(playerNode, playerPhysObj, protClient, running);
+	        dMoveL = new MoveLeftAction(playerNode, playerPhysObj, protClient, running);
+	        dMoveR = new MoveRightAction(playerNode, playerPhysObj, protClient, running);
+	        dYawL = new YawLeftAction(playerNode, playerPhysObj, protClient, running);
+	        dYawR = new YawRightAction(playerNode, playerPhysObj, protClient, running);
 			setupInputs(sm);
 		}
 		
 		if(running == false) {
-	        dMoveF = new MoveForwardAction(playerNode, protClient, running);
-	        dMoveB = new MoveBackwardAction(playerNode, protClient, running);
-	        dMoveL = new MoveLeftAction(playerNode, protClient, running);
-	        dMoveR = new MoveRightAction(playerNode, protClient, running);
-	        dYawL = new YawLeftAction(playerNode, protClient, running);
-	        dYawR = new YawRightAction(playerNode, protClient, running);
+			dMoveF = new MoveForwardAction(playerNode, playerPhysObj, protClient, running);
+	        dMoveB = new MoveBackwardAction(playerNode, playerPhysObj, protClient, running);
+	        dMoveL = new MoveLeftAction(playerNode, playerPhysObj, protClient, running);
+	        dMoveR = new MoveRightAction(playerNode, playerPhysObj, protClient, running);
+	        dYawL = new YawLeftAction(playerNode, playerPhysObj, protClient, running);
+	        dYawR = new YawRightAction(playerNode, playerPhysObj, protClient, running);
 			setupInputs(sm);
 		}
 		

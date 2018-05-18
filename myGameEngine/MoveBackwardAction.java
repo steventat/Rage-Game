@@ -15,8 +15,9 @@ public class MoveBackwardAction extends AbstractInputAction {
 	private boolean physOn;
 	private PhysicsObject playerPhys;
 	
-	public MoveBackwardAction(SceneNode node, ProtocolClient p, boolean phys) {
+	public MoveBackwardAction(SceneNode node, PhysicsObject physObj, ProtocolClient p, boolean phys) {
 		mainNode = node;
+		playerPhys = physObj;
 		protClient = p;
 		physOn = phys;
 	}

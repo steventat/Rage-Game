@@ -16,20 +16,25 @@ public class MoveForwardAction extends AbstractInputAction {
 	private boolean physOn;
 	private PhysicsObject playerPhys;
 	
-	public MoveForwardAction(SceneNode node, ProtocolClient p, boolean phys) {
+	public MoveForwardAction(SceneNode node, PhysicsObject physObj, ProtocolClient p, boolean phys) {
 		mainNode = node;
-		protClient = p;
-		physOn = phys;
-	}
-	
-	public MoveForwardAction(PhysicsObject physObj, ProtocolClient p, boolean phys) {
 		playerPhys = physObj;
 		protClient = p;
 		physOn = phys;
 	}
+	
+	/*public MoveForwardAction(PhysicsObject physObj, ProtocolClient p, boolean phys) {
+		playerPhys = physObj;
+		protClient = p;
+		physOn = phys;
+	}*/
 
 	public void performAction(float arg0, Event arg1) {
 		if(physOn) {
+			//Matrix3f dir = (Matrix3f) mainNode.getWorldRotation();
+			//Vector3f force = (Vector3) Vecto
+			playerPhys.applyForce(0.0f, 0.0f, 10.0f, 0.0f, 
+					0.0f, 0.0f);
 		}
 		else {
 			mainNode.moveForward(0.01f);

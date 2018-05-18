@@ -15,8 +15,9 @@ public class YawRightAction extends AbstractInputAction {
 	private boolean physOn;
 	private PhysicsObject playerPhys;
 	
-	public YawRightAction(SceneNode node, ProtocolClient p, boolean phys) {
+	public YawRightAction(SceneNode node, PhysicsObject physObj, ProtocolClient p, boolean phys) {
 		mainNode = node;
+		playerPhys = physObj;
 		protClient = p;
 		physOn = phys;
 	}

@@ -15,13 +15,8 @@ public class MoveLeftAction extends AbstractInputAction {
 	private boolean physOn;
 	private PhysicsObject playerPhys;
 	
-	public MoveLeftAction(SceneNode node, ProtocolClient p, boolean phys) {
+	public MoveLeftAction(SceneNode node, PhysicsObject physObj, ProtocolClient p, boolean phys) {
 		mainNode = node;
-		protClient = p;
-		physOn = phys;
-	}
-	
-	public MoveLeftAction(PhysicsObject physObj, ProtocolClient p, boolean phys) {
 		playerPhys = physObj;
 		protClient = p;
 		physOn = phys;
