@@ -107,13 +107,16 @@ class MyGame extends VariableFrameRateGame {
     
     private IAudioManager audioMgr;					// sound
     private Sound oceanSound, hereSound;			// sound     
-	
+	private boolean soundToggle	= true;				// sound	PRESS 'O' to enable and disable sound				
+    
     private int maxscore;							// maxscore read from JavaScript file
     private int p1Score = 0;						// score for Player 1			
     private int p2Score = 0;						// score for Player 2
     
 	private GL4RenderSystem rs;							// HUD
     private String elapsTimeStr,  dispStr; 				// HUD
+    
+    private boolean lightToggle = true;					// Light	PRESS 'P' to enable or disable light
 	
 	//I'll leave this static because I wouldn't want two MyGames
 	public static MyGame getGame() {
@@ -186,7 +189,7 @@ class MyGame extends VariableFrameRateGame {
 		im = new GenericInputManager();	//Initializing input manager for controllers
 		
 		//Activate physics
-		running = true;
+		running = false;
 
 		// Java Script
 		ScriptEngineManager factory = new ScriptEngineManager();
@@ -469,9 +472,11 @@ class MyGame extends VariableFrameRateGame {
         } 
         
         // sound
-		hereSound.setLocation(robotNode.getWorldPosition());	
-		oceanSound.setLocation(earthNode.getWorldPosition());	
-		setEarParameters(sm);
+        if (soundToggle) {
+    		hereSound.setLocation(robotNode.getWorldPosition());	
+    		oceanSound.setLocation(earthNode.getWorldPosition());	
+    		setEarParameters(sm);
+        }
 				
 		// build and set HUD
 		rs = (GL4RenderSystem) engine.getRenderSystem();
@@ -689,6 +694,18 @@ class MyGame extends VariableFrameRateGame {
 		   case KeyEvent.VK_W:
 				this.doNWalk();
 				break;
+		   case KeyEvent.VK_O:
+			   soundToggle = ! soundToggle;
+			   if (soundToggle == true) 
+				   audioMgr.resumeAllSounds();
+			   else
+				   audioMgr.pauseAllSounds();;
+			   break;
+		   case KeyEvent.VK_P:
+			   if (lightToggle == true)
+				
+			break;
+			   
 		}
    }
    
